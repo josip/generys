@@ -1,0 +1,134 @@
+* { margin: 0; padding: 0; text-indent: 0; }
+
+body {
+  width: 400px;
+  padding: 0;
+  margin: 0 auto 20px auto;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 12px;
+  color: #00000c;
+  border: 5px solid #ddd;
+  border-top: 0;
+}
+
+a {
+  color: #00f;
+  text-decoration: underline;
+}
+
+a:hover {
+  color: #fff;
+  background: #00f;
+  text-decoration: none;
+}
+
+h1, h2 {
+  text-transform: uppercase;
+  font-weight: normal;
+}
+
+h1 {
+  margin: 0;
+  padding: 0;
+  letter-spacing: -1px;
+  text-shadow: #fff 0 2px 2px;
+}
+
+h2 {
+  letter-spacing: 2px;
+  margin: 5px 0;
+  text-indent: 5px;
+}
+
+p {
+  padding: 5px;
+  margin: 0;
+}
+
+table {
+  border: 0;
+}
+
+hr {
+  background-color: #ddd;
+}
+
+tr.header, td.header {
+  font-weight: bold;
+}
+
+tr.header {
+  background: #ffa;
+}
+
+td {
+  padding: 2px 4px;
+  border-bottom: 1px solid #ddd;
+  border-top: 1px solid #fff;
+}
+
+tr.even {
+  background-color: #f8f8f8;
+}
+
+img#photo{
+  float: right;
+  margin: 0 0 0 5px;
+}
+
+a img {
+  border: 0;
+}
+
+#navigacija {
+  background: #ddd;
+  border-bottom: 1px solid #c0c0c0;
+  padding: 7px 5px 5px 5px;
+  text-align: center;
+  font-size: 1.2em;
+  letter-spacing: -1px;
+}
+
+#navigacija ul {
+  list-style: none;
+}
+
+#navigacija ul li {
+  display: inline;
+}
+
+#navigacija ul li a {
+  padding: 2px;
+}
+
+#navigacija ul li.trenutno a, #navigacija ul li.trenutno a:hover {
+  background-color: #fff;
+  color: #f01a6e;
+  text-decoration: none;
+}
+
+.uvod, .album {
+  margin: 0;
+  background-color: #FEF2FB;
+  border-bottom: 1px solid #ddd;
+  padding: 5px;
+}
+
+.album {
+  cursor: pointer;
+}
+
+.clear {
+  clear: both;
+  visibility: hidden;
+}
+
+img.cover {
+  display: block;
+  float: left;
+  margin: 5px;
+}
+
+div.songlist {
+  display: none;
+}

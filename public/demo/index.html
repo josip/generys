@@ -1,0 +1,676 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>Glazba</title>
+		<link rel="stylesheet" href="styles.css" type="text/css" media="screen" charset="utf-8"/>
+		<script type="text/javascript" charset="utf-8">
+		  (function () {
+		    function $ (id) {
+		      return document.getElementById(id);
+		    };
+		    
+		    function $$ (class_name) {
+		      return document.getElementsByClassName(class_name);
+		    };
+		    
+		    function toggleEl(el) {
+		      var visible = el.style.display !== "none";
+		      el.style.display = visible ? "none" : "block";
+		      
+		      return el;
+		    };
+		    
+		    function scrollToElement(el) {
+		      var max = el.offsetTop,
+		          body = document.getElementsByTagName("body")[0];
+
+		      animate(body, "scrollTop", max, function (c, f, dec) {
+		        var d = 12 + (f/36),
+		            res = dec ? c - d : c + d;
+		        return dec ? (res <= max ? false : res) : (res >= max ? false : res);
+		      });
+		      
+		      return el;
+		    };
+
+		    function animate(source, property, max, fn) {
+		      var delta = max - source[property];
+		          dec   = delta < 0,
+		          frame = 0, finished = false;
+
+          delta = Math.abs(delta);
+		      var i = setInterval(function () {
+		        var val = fn(source[property], frame, dec);
+		        if(val === false) {
+		          finished = true;
+		          return clearInterval(i);
+		        }
+
+            source[property] = val;
+
+		        frame++;
+		      }, 1);
+		      
+		      setTimeout(function () {
+		        if(finished)
+		          return false;
+		        
+		        clearInterval(i);
+		        source[property] = max;  
+		      }, 720);
+		    };
+		    
+		    function onAlbumClick (album) {
+		      return function (e) {
+		        if(e.srcElement.tagName.toLowerCase() === "a")
+		          return true;
+
+		        e.preventDefault();
+		        e.stopPropagation();
+
+		        if(toggleEl(album.nextSibling.nextSibling).style.display === "block")
+		          scrollToElement(album);
+
+		        return false;
+		      };
+		    };
+		    
+		    window.captureEvents(Event.CLICK);
+		    window.onload = function () {
+		      var albums = $$("album"), n = albums.length;
+		      while(n--)
+		        albums[n].addEventListener("click", onAlbumClick(albums[n]), true);
+		    };
+		  })()
+		</script>
+	</head>
+	<body>
+	  <div id="navigacija">
+	    <ul>
+        <li><a href="#">About me</a></li>
+        <li class="trenutno"><a href="#">Favourite music</a></li>
+        <li><a href="#">Photos</a></li>
+      </ul>
+      <hr class="clear"/>
+	  </div>
+    <div class="album">
+		  <img src="slike/keane_ps.jpg" alt="Album cover" class="cover"/>
+		  <h1>Keane: Perfect Symmetry</h1>
+		  <a target="_blank" href="http://keanemusic.com">&#x2192; keanemusic.com</a><br/>
+		  <a target="_blank" href="http://www.amazon.com/Perfect-Symmetry-Keane/dp/B001FBSMW6">&#x2192; Amazon.com</a>
+		  <hr class="clear"/>
+		</div>
+		<div class="songlist" style="display:none">
+      <table cellpadding="0" cellspacing="0" style="width:100%">
+        <tr class="header">
+          <td>br.</td>
+          <td>Naslov</td>
+          <td>Trajanje</td>
+        </tr>
+        <tr>
+          <td>1.</td>
+          <td>Spiralling</td>
+          <td>4:19</td>
+        </tr>
+        <tr class="even">
+          <td>2.</td>
+          <td>The Lovers Are Losing</td>
+          <td>5:04</td>
+        </tr>
+        <tr>
+          <td>3.</td>
+          <td>Better Than This</td>
+          <td>4:04</td>
+        </tr>
+        <tr class="even">
+          <td>4.</td>
+          <td>You Haven't Told Me Anything</td>
+          <td>3:47</td>
+        </tr>
+        <tr>
+          <td>5.</td>
+          <td>Perfect Symmetry</td>
+          <td>5:12</td>
+        </tr>
+        <tr class="even">
+          <td>6.</td>
+          <td>You Don't See Me</td>
+          <td>4:03</td>
+        </tr>
+        <tr>
+          <td>7.</td>
+          <td>Again And Again</td>
+          <td>3:50</td>
+        </tr>
+        <tr class="even">
+          <td>8.</td>
+          <td>Playing Along</td>
+          <td>5:35</td>
+        </tr>
+        <tr>
+          <td>9.</td>
+          <td>Pretend That You're Alone</td>
+          <td>3:47</td>
+        </tr>
+        <tr class="even">
+          <td>10.</td>
+          <td>Black Burning Heart</td>
+          <td>5:23</td>
+        </tr>
+        <tr>
+          <td>11.</td>
+          <td>Love Is The End</td>
+          <td>5:38</td>
+        </tr>
+      </table>
+		</div>
+	  <div class="album">
+      <img src="slike/keane_utis.jpg" alt="Album cover" class="cover"/>
+      <h1>Keane: Under The Iron Sea</h1>
+      <a target="_blank" href="http://keanemusic.com">&#x2192; keanemusic.com</a><br/>
+      <a target="_blank" href="http://www.amazon.com/Under-Iron-Sea-Keane/dp/B000FBHT1C">&#x2192; Amazon.com</a>
+      <hr class="clear"/>
+	  </div>
+	  <div class="songlist" style="display:none">
+	    <table cellpadding="0" cellspacing="0" width="100%">
+	      <tr class="header">
+	        <td>br.</td>
+	        <td>Naslov</td>
+	        <td>Trajanje</td>
+	      </tr>
+	      <tr>
+	        <td>1.</td>
+	        <td>Atlantic</td>
+	        <td>4:13</td>
+	      </tr>
+	      <tr class="even">
+	        <td>2.</td>
+	        <td>Is It Any Wonder?</td>
+	        <td>3:06</td>
+	      </tr>
+	      <tr>
+	        <td>3.</td>
+	        <td>Noting In My Way</td>
+	        <td>4:00</td>
+	      </tr>
+	      <tr class="even">
+	        <td>4.</td>
+	        <td>Leaving So Soon?</td>
+	        <td>3:59</td>
+	      </tr>
+	      <tr>
+	        <td>5.</td>
+	        <td>A Bad Dream</td>
+	        <td>5:06</td>
+	      </tr>
+	      <tr class="even">
+	        <td>6.</td>
+	        <td>Hamburg Song</td>
+	        <td>4:37</td>
+	      </tr>
+	      <tr>
+	        <td>7.</td>
+	        <td>Put It Behind You</td>
+	        <td>3:36</td>
+	      </tr>
+	      <tr class="even">
+	        <td>8.</td>
+	        <td>The Iron Sea</td>
+	        <td>2:57</td>
+	      </tr>
+	      <tr>
+	        <td>9.</td>
+	        <td>Crystal Ball</td>
+	        <td>3:53</td>
+	      </tr>
+	      <tr class="even">
+	        <td>10.</td>
+	        <td>Try Again</td>
+	        <td>4:27</td>
+	      </tr>
+	      <tr>
+	        <td>11.</td>
+	        <td>Broken Toy</td>
+	        <td>6:07</td>
+	      </tr>
+	      <tr class="even">
+	        <td>12.</td>
+	        <td>The Frog Prince</td>
+	        <td>4:22</td>
+	      </tr>
+	    </table>
+	  </div>
+	  <div class="album">
+      <img src="slike/keane_hf.jpg" alt="Album cover" class="cover"/>
+      <h1>Keane: Hopes And Fears</h1>
+      <a target="_blank" href="http://keanemusic.com">&#x2192; keanemusic.com</a><br/>
+      <a target="_blank" href="http://www.amazon.com/Hopes-Fears-Keane/dp/B000268QB2/ref=pd_sim_m_16">&#x2192; Amazon.com</a>
+      <hr class="clear"/>
+	  </div>
+	  <div class="songlist" style="display:none">
+	    <table cellpadding="0" cellspacing="0" width="100%">
+	      <tr class="header">
+	        <td>br.</td>
+	        <td>Naslov</td>
+	        <td>Trajanje</td>
+	      </tr>
+	      <tr>
+	        <td>1.</td>
+	        <td>Somewhere Only We Know</td>
+	        <td>3:57</td>
+	      </tr>
+	      <tr class="even">
+	        <td>2.</td>
+	        <td>Bend And Break</td>
+	        <td>3:40</td>
+	      </tr>
+	      <tr>
+	        <td>3.</td>
+	        <td>We Might As Well Be Strangers</td>
+	        <td>3:12</td>
+	      </tr>
+	      <tr class="even">
+	        <td>4.</td>
+	        <td>Everybody's Changing</td>
+	        <td>3:35</td>
+	      </tr>
+	      <tr>
+	        <td>5.</td>
+	        <td>Your Eyes Open</td>
+	        <td>3:23</td>
+	      </tr>
+	      <tr class="even">
+	        <td>6.</td>
+	        <td>She Has No Time</td>
+	        <td>5:45</td>
+	      </tr>
+	      <tr>
+	        <td>7.</td>
+	        <td>Can't Stop Now</td>
+	        <td>3:38</td>
+	      </tr>
+	      <tr class="even">
+	        <td>8.</td>
+	        <td>Sunshine</td>
+	        <td>4:12</td>
+	      </tr>
+	      <tr>
+	        <td>9.</td>
+	        <td>This Is The Last Time</td>
+	        <td>3:29</td>
+	      </tr>
+	      <tr class="even">
+	        <td>10.</td>
+	        <td>On A Day Like Today</td>
+	        <td>5:27</td>
+	      </tr>
+	      <tr>
+	        <td>11.</td>
+	        <td>Untitled 1</td>
+	        <td>5:36</td>
+	      </tr>
+	      <tr class="even">
+	        <td>12.</td>
+	        <td>Bedshaped</td>
+	        <td>4:37</td>
+	      </tr>
+	    </table>
+	  </div>
+	  <div class="album">
+      <img src="slike/coldplay_xy.jpg" alt="Album cover" class="cover"/>
+      <h1>Coldplay - X &amp; Y</h1>
+      <a target="_blank" href="http://coldplay.com">&#x2192; coldplay.com</a><br/>
+      <a target="_blank" href="http://www.amazon.com/X-Y-Coldplay/dp/B0006L16N8">&#x2192; Amazon.com</a>
+      <hr class="clear"/>
+	  </div>
+	  <div class="songlist" style="display:none">
+	    <table cellpadding="0" cellspacing="0" width="100%">
+	      <tr class="header">
+	        <td>br.</td>
+	        <td>Naslov</td>
+	        <td>Trajanje</td>
+	      </tr>
+	      <tr>
+	        <td>1.</td>
+	        <td>Square One</td>
+	        <td>4:47</td>
+	      </tr>
+	      <tr class="even">
+	        <td>2.</td>
+	        <td>What If</td>
+	        <td>4:57</td>
+	      </tr>
+	      <tr>
+	        <td>3.</td>
+	        <td>White Shadows</td>
+	        <td>5:28</td>
+	      </tr>
+	      <tr class="even">
+	        <td>4.</td>
+	        <td>Fix You</td>
+	        <td>4:54</td>
+	      </tr>
+	      <tr>
+	        <td>5.</td>
+	        <td>Talk</td>
+	        <td>5:11</td>
+	      </tr>
+	      <tr class="even">
+	        <td>6.</td>
+	        <td>X&amp;Y</td>
+	        <td>4:34</td>
+	      </tr>
+	      <tr>
+	        <td>7.</td>
+	        <td>Speed Of Sound</td>
+	        <td>4:48</td>
+	      </tr>
+	      <tr class="even">
+	        <td>8.</td>
+	        <td>A Message</td>
+	        <td>4:54</td>
+	      </tr>
+	      <tr>
+	        <td>9.</td>
+	        <td>Low</td>
+	        <td>5:32</td>
+	      </tr>
+	      <tr class="even">
+	        <td>10.</td>
+	        <td>The Hardest Part</td>
+	        <td>4:54</td>
+	      </tr>
+	      <tr>
+	        <td>11.</td>
+	        <td>Swallowed in the Sea</td>
+	        <td>3:58</td>
+	      </tr>
+	      <tr class="even">
+	        <td>12.</td>
+	        <td>Twisted Logic</td>
+	        <td>5:01</td>
+	      </tr>
+	      <tr>
+          <td>13.</td>
+          <td>Till Kingdom Come</td>
+          <td>4:12</td>
+	      </tr>
+	    </table>
+	  </div>
+	  <div class="album">
+      <img src="slike/coldplay_vvdahf.jpg" alt="Album cover" class="cover"/>
+      <h1>Coldplay: Viva La Vida or Death and All His Friends</h1>
+      <a target="_blank" href="http://coldplay.com">&#x2192; coldplay.com</a><br/>
+      <a target="_blank" href="http://www.amazon.com/Viva-Vida-Coldplay/dp/B000RPTQ1C">&#x2192; Amazon.com</a>
+      <hr class="clear"/>
+	  </div>
+	  <div class="songlist" style="display:none">
+	    <table cellpadding="0" cellspacing="0" width="100%">
+	      <tr class="header">
+	        <td>br.</td>
+	        <td>Naslov</td>
+	        <td>Trajanje</td>
+	      </tr>
+	      <tr>
+	        <td>1.</td>
+	        <td>Life in Technicolor</td>
+	        <td>2:29</td>
+	      </tr>
+	      <tr class="even">
+	        <td>2.</td>
+	        <td>Cemeteries of London</td>
+	        <td>3:21</td>
+	      </tr>
+	      <tr>
+	        <td>3.</td>
+	        <td>Lost!</td>
+	        <td>3:55</td>
+	      </tr>
+	      <tr class="even">
+	        <td>4.</td>
+	        <td>42</td>
+	        <td>3:57</td>
+	      </tr>
+	      <tr>
+	        <td>5.</td>
+	        <td>Lovers in Japan/Reign of Love</td>
+	        <td>6:51</td>
+	      </tr>
+	      <tr class="even">
+	        <td>6.</td>
+	        <td>Yes/Chinese Sleep Chant</td>
+	        <td>7:06</td>
+	      </tr>
+	      <tr>
+	        <td>7.</td>
+	        <td>Viva la Vida</td>
+	        <td>4:01</td>
+	      </tr>
+	      <tr class="even">
+	        <td>8.</td>
+	        <td>Violet Hill</td>
+	        <td>3:42</td>
+	      </tr>
+	      <tr>
+	        <td>9.</td>
+	        <td>Strawberry Swing</td>
+	        <td>4:09</td>
+	      </tr>
+	      <tr class="even">
+	        <td>10.</td>
+	        <td>Death and All His Friends/The Escapist</td>
+	        <td>6:18</td>
+	      </tr>
+	    </table>
+	  </div>
+	  <div class="album">
+      <img src="slike/killers_da.jpg" alt="Album cover" class="cover"/>
+      <h1>The Killers: Day &amp; Age</h1>
+      <a target="_blank" href="http://thekillersmusic.com">&#x2192; thekillersmusic.com</a><br/>
+      <a target="_blank" href="http://www.amazon.com/Day-Age-Killers/dp/B001FWRZ46">&#x2192; Amazon.com</a>
+      <hr class="clear"/>
+	  </div>
+	  <div class="songlist" style="display:none">
+	    <table cellpadding="0" cellspacing="0" width="100%">
+	      <tr class="header">
+	        <td>br.</td>
+	        <td>Naslov</td>
+	        <td>Trajanje</td>
+	      </tr>
+	      <tr>
+	        <td>1.</td>
+	        <td>Losing Touch</td>
+	        <td>4:15</td>
+	      </tr>
+	      <tr class="even">
+	        <td>2.</td>
+	        <td>Human</td>
+	        <td>4:09</td>
+	      </tr>
+	      <tr>
+	        <td>3.</td>
+	        <td>Spaceman</td>
+	        <td>4:44</td>
+	      </tr>
+	      <tr class="even">
+	        <td>4.</td>
+	        <td>Joy Ride</td>
+	        <td>3:33</td>
+	      </tr>
+	      <tr>
+	        <td>5.</td>
+	        <td>A Dustland Fairytale</td>
+	        <td>3:45</td>
+	      </tr>
+	      <tr class="even">
+	        <td>6.</td>
+	        <td>This Is Your Life</td>
+	        <td>3:41</td>
+	      </tr>
+	      <tr>
+	        <td>7.</td>
+	        <td>I Can't Stay</td>
+	        <td>3:06</td>
+	      </tr>
+	      <tr class="even">
+	        <td>8.</td>
+	        <td>Neon Tiger</td>
+	        <td>3:05</td>
+	      </tr>
+	      <tr>
+	        <td>9.</td>
+	        <td>The World We Live In</td>
+	        <td>4:40</td>
+	      </tr>
+	      <tr class="even">
+	        <td>10.</td>
+	        <td>Goodnight, Travel Well</td>
+	        <td>6:51</td>
+	      </tr>
+	    </table>
+	  </div>
+	  
+	  <div class="album">
+      <img src="slike/fleet_foxes.jpg" alt="Album cover" class="cover"/>
+      <h1>Fleet Foxes: Fleet Foxes</h1>
+      <a target="_blank" href="http://www.myspace.com/fleetfoxes">&#x2192; MySpace</a><br/>
+      <a target="_blank" href="http://www.amazon.com/Fleet-Foxes/dp/B0017R5UAA">&#x2192; Amazon.com</a>
+      <hr class="clear"/>
+	  </div>
+	  <div class="songlist" style="display:none">
+	    <table cellpadding="0" cellspacing="0" width="100%">
+	      <tr class="header">
+	        <td>br.</td>
+	        <td>Naslov</td>
+	        <td>Trajanje</td>
+	      </tr>
+	      <tr>
+	        <td>1.</td>
+	        <td>Sun It Rises</td>
+	        <td>3:11</td>
+	      </tr>
+	      <tr class="even">
+	        <td>2.</td>
+	        <td>White Winter Hymnal</td>
+	        <td>2:27</td>
+	      </tr>
+	      <tr>
+	        <td>3.</td>
+	        <td>Ragged Wood</td>
+	        <td>5:07</td>
+	      </tr>
+	      <tr class="even">
+	        <td>4.</td>
+	        <td>Tiger Mountain Peasant Song</td>
+	        <td>3:28</td>
+	      </tr>
+	      <tr>
+	        <td>5.</td>
+	        <td>Quiet Houses</td>
+	        <td>3:32</td>
+	      </tr>
+	      <tr class="even">
+	        <td>6.</td>
+	        <td>He Doesn't Know Why</td>
+	        <td>3:20</td>
+	      </tr>
+	      <tr>
+	        <td>7.</td>
+	        <td>Heard Them Stirring</td>
+	        <td>3:02</td>
+	      </tr>
+	      <tr class="even">
+	        <td>8.</td>
+	        <td>Your Protector</td>
+	        <td>4:09</td>
+	      </tr>
+	      <tr>
+	        <td>9.</td>
+	        <td>Meadowlarks</td>
+	        <td>3:11</td>
+	      </tr>
+	      <tr class="even">
+	        <td>10.</td>
+	        <td>Blue Ridge Mountains</td>
+	        <td>4:25</td>
+	      </tr>
+	      <tr>
+	        <td>11.</td>
+	        <td>Oliver James</td>
+	        <td>3:23</td>
+	      </tr>
+	    </table>
+	  </div>
+	  <div class="album">
+      <img src="slike/mika_licm.jpg" alt="Album cover" class="cover"/>
+      <h1>Mika: Life in Cartoon Motion</h1>
+      <a target="_blank" href="http://mikasounds.com">&#x2192; mikasounds.com</a><br/>
+      <a target="_blank" href="http://www.amazon.com/Life-in-Cartoon-Motion/dp/B001O05X2U">&#x2192; Amazon.com</a>
+      <hr class="clear"/>
+	  </div>
+	  <div class="songlist" style="display:none">
+	    <table cellpadding="0" cellspacing="0" width="100%">
+	      <tr class="header">
+	        <td>br.</td>
+	        <td>Naslov</td>
+	        <td>Trajanje</td>
+	      </tr>
+	      <tr>
+	        <td>1.</td>
+	        <td>Grace Kelly</td>
+	        <td>3:05</td>
+	      </tr>
+	      <tr class="even">
+	        <td>2.</td>
+	        <td>Lollipop</td>
+	        <td>3:05</td>
+	      </tr>
+	      <tr>
+	        <td>3.</td>
+	        <td>My Interpretation</td>
+	        <td>3:35</td>
+	      </tr>
+	      <tr class="even">
+	        <td>4.</td>
+	        <td>Love Today</td>
+	        <td>3:55</td>
+	      </tr>
+	      <tr>
+	        <td>5.</td>
+	        <td>Relax, Take It Easy</td>
+	        <td>4:30</td>
+	      </tr>
+	      <tr class="even">
+	        <td>6.</td>
+	        <td>Any Other World</td>
+	        <td>4:19</td>
+	      </tr>
+	      <tr>
+	        <td>7.</td>
+	        <td>Billy Brown</td>
+	        <td>3:15</td>
+	      </tr>
+	      <tr class="even">
+	        <td>8.</td>
+	        <td>Big Girl (You Are Beautiful)</td>
+	        <td>4:11</td>
+	      </tr>
+	      <tr>
+	        <td>9.</td>
+	        <td>Stuck in the Middle</td>
+	        <td>4:07</td>
+	      </tr>
+	      <tr class="even">
+	        <td>10.</td>
+	        <td>Happy Ending/Over My Shoulder</td>
+	        <td>10:21</td>
+	      </tr>
+	      <tr>
+	        <td>11.</td>
+	        <td>Ring Ring</td>
+	        <td>2:49</td>
+	      </tr>
+	    </table>
+	  </div>
+	</body>
+</html>
