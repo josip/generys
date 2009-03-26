@@ -121,7 +121,7 @@ Generys := HttpServer clone do (
     )
     (respType == "File") ifTrue(
       Path isPathAbsolute(ctrlResp path) ifFalse(
-        ctrlResp path = Generys publicDir .. ctrlResp path
+        ctrlResp path = Generys publicDir ..(ctrlResp path)
       )
       return serveFile(ctrlResp, httpResp)
     )
