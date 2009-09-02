@@ -1,13 +1,15 @@
-Controller clone do(
-  _users := list(
-    {name := "Josip", last_name := "Lisec"},
-    {name := "Marko", last_name := "Lisec"}
-  )
+UsersController := Controller clone do(
+  _users := {
+    {name: "John", last_name: "Doe"},
+    {name: "Jane", last_name: "Doe"}
+  }
 
   index := method(_users)
 
   show := method(id,
-    user := _users at(id asNumber)
-    if(params hasSlot("val"), user at(params val), user)
-  )
+    user := _users[id asNumber]
+
+    if(params["val"],
+      user[params["val"]],
+      user))
 )

@@ -1,5 +1,3 @@
-StaticPages := Controller clone do (
-  name = "StaticPages"
-
-  index := method(File clone setPath(Generys publicDir .. "/welcome.html"))
+StaticPagesController := Controller clone do (
+  index := method(File with(Generys publicDir .. "/index.svg"))
 )

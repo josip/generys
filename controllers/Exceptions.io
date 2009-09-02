@@ -1,19 +1,18 @@
-Generys exceptionController do(
-  privateSlots = ["status"]
+Generys ExceptionsController do(
+  privateSlots = {"status"}
 
   notFound := method(e,
-    status(404)
-    "Not Found (404)"
+    self status(404)
+    "<h1>Not found (e#404)</h1>"
   )
-  noRoute := getSlot("notFound")
 
   internalError := method(e,
-    status(500)
-    response statusCode = 500
-    "Internal server error (500)"
+    self status(500)
+    "Internal server error (e#500)"
   )
-  wrongRequestMethod := getSlot("internalError")
-  brokenRoute := getSlot("internalError")
 
-  status := method(code, response statusCode = code)
+  wrongRequestMethod := getSlot("internalError")
+  noRoute := method(call delegateToMethod(self, "notFound"))
+
+  status := method(code, self response statusCode = code)
 )
