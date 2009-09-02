@@ -2,166 +2,115 @@
 
 HttpServer
 IoExtensions
-
-log := method(
-  allowed := Generys log_level
-  log_symbols := {debug := "#", error := "!", info := "-"}
-
-  (allowed == "none") ifTrue(return false)
-
-  level   := call argAt(0) argAt(0) name exSlice(1, -1)
-  message := call argAt(0) argAt(1) name exSlice(1, -1) interpolate(call sender)
-  symbol  := log_symbols at(level)
-
-  log_keys := log_symbols keys
-  if((allowed == "all") or (log_keys indexOf(allowed) <= log_keys indexOf(level)),
-    " #{symbol} #{message}" interpolate println
-  )
-)
+Log
 
 Generys := HttpServer clone do (
+  version     := 0.2
+  
   routes      := List clone
+  
   controllers := List clone
-  exceptionController := Controller cloneWithoutInit do(
-    name    = "Exceptions"
-    private = true
-    init    = nil
-  )
-
-  start = method(
-    log(info = "You can find Generys on route #{host} at mile #{port}")
-    super(start)
-  )
-
-  renderResponse := method(req, resp,
-    log(info = "Processing request #{req path}")
-    req path = if((req path exSlice(-1) == "/") and(req path size > 1),
-      req path exSlice(0, -1),
-      req path
-    )
-
-    hasRoute := false
-    routes foreach(route,
-      matches := route mapToPath(req path)
-      if(matches not, matches = Map clone)
-
-      if((req path == route pattern) or((matches values remove(nil) size > 0) and(matches keys sort == route namedParts sort)),
-        log(debug:="Activating route #{route pattern} for #{req path}"); hasRoute = true,
-        continue
-      )
-
-      source := route
-      slotName := "responseMethod"
-
-      source getSlot(slotName) ifNil(
-        controllerName := if(route ?controller, route controller, return false)
-        (controllerName exSlice(0, 1) == ":") ifTrue(
-          controllerName = matches at(controllerName exSlice(1))
-        )
-
-        slotName = if(route ?action, route action, "index")
-        (slotName exSlice(0, 1) == ":") ifTrue(
-          slotName = matches at(slotName exSlice(1))
-        )
-
-        source = controllers select(controller,
-          (controller name == controllerName) and (controller private == false)
-        ) at(0)
-
-        source ifNil(handleException("brokenRoute", resp, req); break)
-        source = source cloneWithoutInit setResponse(resp) setRequest(req) setParams(req parameters asObject)
-      )
-
-      yield
-
-      source hasSlot(slotName) ifTrue(
-        if(source ?privateSlots ?contains(slotName),
-          log(error:="Client requested private method, #{source name}##{slotName}")
-          handleException("noRoute", resp, req)
-        )
-      
-        (slotName == "responseMethod") ifTrue(
-          matches atPut("response", resp)
-          matches atPut("request", req)
-        )
-        slotArgs := source getSlot(slotName) argumentNames map(arg, matches at(arg))
-
-        e := try(
-          controllerResp := source performWithArgList(slotName, slotArgs)
-          if(controllerResp == Controller SKIP_ME,
-            hasRoute = Controller SKIP_ME,
-            resp body appendSeq(parseResponse(resp, controllerResp))
-          )
-        )
-        
-        # We have to "continue" from this context as it would have no effect
-        # if used within try()
-        (hasRoute == Controller SKIP_ME) ifTrue(
-          hasRoute = false
-          log(debug:="Skipping elected route #{route pattern} for #{req path}")
-          continue
-        )
-
-        e catch(Exception,
-          log(error:="Cought exception #{e error} while rendering #{req path}")
-          handleException(e, resp, req)
-        )
-      )
-      break
-    )
-
-    hasRoute ifFalse(handleException("noRoute", resp, req))
-  )
-
-  parseResponse := method(httpResp, ctrlResp,
-    respType := ctrlResp type
-    (respType == "Map" or(respType == "List")) ifTrue(
-      httpResp contentType = "text/javascript"
-      return ctrlResp asJson
-    )
-    (respType == "File") ifTrue(
-      Path isPathAbsolute(ctrlResp path) ifFalse(
-        ctrlResp path = Generys publicDir ..(ctrlResp path)
-      )
-      return serveFile(ctrlResp, httpResp)
-    )
-
-    ctrlResp
+  controllers at := method(name,
+    name = name .. "Controller"
+    self select(controller, controller type == name) first)
+  
+  formatters  := List clone
+  
+  config := Object clone do(
+    host                := "127.0.0.1"
+    port                := 8080
+    logLevel            := "debug"
+    poweredByHeader     := "Io/" .. System version
+    useXSendFileHeader  := false
   )
   
-  serveFile := method(file, httpResp, 
-    file exists ifFalse(
-      raise Exception("notFound")
-    )
-    if(Generys x_sendfile_header,
-      httpResp contentType = nil
-      httpResp setHeader("X-Sendfile", file path)
-      return "",
+  ExceptionsController := Controller cloneWithoutInit do(
+    private = true
+    init    = nil)
+    
+  start = method(
+    host := config host
+    port := config port
+    
+    if(self config poweredByHeader isNil not,
+      self config poweredByHeader = self config poweredByHeader .. "+Generys/" .. self version)
+    
+    log info("You can find Generys on route #{host} at mile #{port}")
+    super(start))
 
-      # TODO: Get MIME type
-      file openForReading
-      contents := file contents
-      file close
-      return contents
-    )
+  renderResponse := method(req, resp,
+    log info("Processing request #{req path}")
+    if(self config poweredByHeader isNil not,
+      resp setHeader("X-Powered-By", self config poweredByHeader))
+    
+    req path = if((req path exSlice(-1) == "/") and(req path size > 1),
+      req path exSlice(0, -1),
+      req path)
+
+    formattedResponse := self formatResponse(self dispatch(req, resp), resp)
+    resp body appendSeq(formattedResponse)
   )
 
-  handleException := method(e, resp, req,
-    (e type == "Sequence") ifTrue(
-      error := e
-      e = Exception clone
-      e error := error
-    )
+  dispatch := method(req, resp,
+    candidates := routes select(route, route respondsTo(req path))
+    candidates isEmpty ifTrue(return Error with("noRoute"))
+    
+    route := candidates first
+    route ifNil(return Error with("noRoute"))
+    
+    obj := nil
+    slotName := nil
+    mappedValues := route mapToPath(req path)
 
-    ec := Generys exceptionController clone setResponse(resp) setRequest(req)
-    if(ec hasSlot(e error),
-      log(error:="Activating handler for '#{e error}' exception")
-      resp body appendSeq(ec perform(e error, e))
+    if(route getSlot("responseMethod") isNil not,
+      obj := route
+      slotName = "responseMethod"
+      mappedValues atPut("request", req)
+      mappedValues atPut("response", resp)
     ,
-      log(error:="No handler for '#{e error}' exception; showing exception to user")
-      resp status = 500
-      resp body appendSeq("An unknow error occured:<br/><pre>#{e}</pre>" interpolate)
+      controllerName := route controller
+      (controllerName[0] == ":"[0]) ifTrue(
+        controllerName = mappedValues[controllerName exSlice(1)])
+      obj = Generys controllers[controllerName]
+
+      obj ifNil(
+        log debug("Route #{route} requires non-existing controller '#{controllerName}'")
+        return Error with("noController"))
+
+      slotName = route action
+      (slotName[0] == ":"[0]) ifTrue(slotName = mappedValues[slotName exSlice(1)])
+      
+      obj ?privateSlots ?contains(slotName) ifTrue(
+        log debug("Route #{route} requires private slot '#{slotName}'")
+        return Error with("noSlot"))
+
+      obj = obj cloneWithoutInit setResponse(resp) setRequest(req) setParams(req parameters)
     )
-  )
+    
+    slotName ifNil(return Error with("noSlot"))
+    obj hasSlot(slotName) ifFalse(return Error with("noSlot"))
+
+    slotResp := nil
+    e := try(
+      args := obj getSlot(slotName) argumentNames map(arg, mappedValues[arg])
+      slotResp = obj performWithArgList(slotName, args))
+    e catch(Exception,
+      (e error == "skipRoute") ifTrue(log info("Should skip route #{route}"))
+      log error("Cought exception #{e error} while rendering #{req path}"))
+
+    if(e, e, slotResp))
+
+  formatResponse := method(ctrlResp, resp,
+    rtype := ctrlResp type
+    formatter := self formatters reverse select(f,
+      (f ?respondsToType == rtype) or (f ?respondsToTypes contains(rtype)))
+    formatter isEmpty ifTrue(
+      formatter := self formatters reverse select(f, f test(ctrlResp)))
+        
+    if(formatter isEmpty,
+      ctrlResp asString,
+      formatter first format(ctrlResp, resp)))
 )
 Generys clone := Generys
+
+ResponseFormatter
