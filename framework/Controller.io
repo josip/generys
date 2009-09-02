@@ -1,5 +1,4 @@
 Controller := Object clone do (
-  name          ::= nil
   request       ::= nil
   response      ::= nil
   params        ::= nil
@@ -7,21 +6,17 @@ Controller := Object clone do (
   privateSlots   := nil
 
   init := method(
-    name          = nil
     request       = nil
     response      = nil
     params        = nil
     private       = false
     privateSlots  = list()
 
-    Generys controllers appendIfAbsent(self)
-  )
+    Generys controllers appendIfAbsent(self))
 
   accepts := method(
-    call message arguments map(asString) contains(request requestMethod) ifFalse(
-      Exception raise("wrongRequestMethod")
-    )
-  )
+    call message arguments map(arg, arg asString) contains(request requestMethod) ifFalse(
+      Exception raise("wrongRequestMethod")))
 
   isPOST    := method(request requestMethod == "POST")
   isGET     := method(request requestMethod == "GET")
@@ -29,16 +24,13 @@ Controller := Object clone do (
   isDELETE  := method(request requestMethod == "DELETE")
 
   cacheFor := method(dur,
-    response setHeader("Cache-Control", "max-age=" .. dur .. ", must-revalidate")
-  )
+    response setHeader("Cache-Control", "max-age=" .. dur .. ", must-revalidate"))
 
   dontCache := method(
     response setHeader("Expires", Date fromNumber(0) asHTTPDate)
-    response setHeader("Cache-Control", "no-cache, no-store")
-  )
+    response setHeader("Cache-Control", "no-cache, no-store"))
 
   forceDownload := method(filename,
-    response setHeader("Content-Disposition", "attachment; filename=" .. filename)
-  )
+    response setHeader("Content-Disposition", "attachment; filename=" .. filename))
 )
 Controller setSlot("SKIP_ME", 1)
