@@ -1,12 +1,15 @@
 #!/usr/bin/env io
 
-Importer turnOn
 list("framework/", "lib/") foreach(path, Importer addSearchPath(path))
 
-Generys root := Directory currentWorkingDirectory clone
-Generys publicDir := Generys root .. "/public" 
+Generys do(
+  root := Directory currentWorkingDirectory asString
+  publicDir := Generys root .. "/public"
+  config do(doFile("config/default.json") asObject)
+)
 
-Directory clone with("config/") doFiles
+doFile("config/routes.io")
+
 Directory clone with("controllers/") doFiles
 
 Generys start
