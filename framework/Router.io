@@ -1,21 +1,36 @@
 Regex
 
 Router := Object clone do (
-  match := method(pattern, RouteMatch clone setRoute(Route clone setPattern(pattern)))
+  connect := method(pattern, RouteMatch clone setRoute(Route clone setPattern(pattern)))
   
+  GET     := method(self connect(call evalArgAt(0)) ifHttpMethod("GET"))
+  POST    := method(self connect(call evalArgAt(0)) ifHttpMethod("POST"))
+  PUT     := method(self connect(call evalArgAt(0)) ifHttpMethod("PUT"))
+  DELETE  := method(self connect(call evalArgAt(0)) ifHttpMethod("DELETE"))
+
+  resource := method(name,
+    controllerPath := ("/" .. name .. "s") asLowercase
+    resourcePath :=  ("/" .. name .. "/:id") asLowercase
+    name = name .. "s"
+    
+    GET(controllerPath)   from({controller: name,   action: "index"})
+    POST(controllerPath)  to({controller: name,     action: "create"})
+    GET(resourcePath)     from({controller: name,   action: "show"})
+    PUT(resourcePath)     to({controller: name,     action: "update"})
+    DELETE(resourcePath)  from({controller: name,   action: "destroy"}))
+
   defaultRoutes := method(
-    match("/:controller/:action/:id") to(controller := ":controller", action := ":action")
-    match("/:controller/:action") to(controller := ":controller", action := ":action")
-    match("/:controller") to(controller := ":controller", action := "index")
-  )
-  
+    connect("/:controller/:action/:id.:format") to({controller: ":controller", action: ":action"})
+    connect("/:controller/:action/:id")         to({controller: ":controller", action: ":action"})
+    connect("/:controller/:action")             to({controller: ":controller", action: ":action"})
+    connect("/:controller")                     to({controller: ":controller", action: "index"}))
+
   fileServerRoutes := method(
-    match("*path") to(method(path, request, response,
+    connect("*path") to(method(path, request, response,
       path = URL unescapeString(path)
-      file := File clone setPath(Generys publicDir .. path)
-      if(file exists and(file isDirectory not), file, Controller SKIP_ME)
-    )) as("fileServer")
-  )
+      file := File with(Generys publicDir .. path)
+      if(file exists, file, Exception raise("skipRoute"))
+    )) as("fileServer"))
 )
 Router clone := Router
 
@@ -25,49 +40,69 @@ RouteMatch := Object do (
   to := method(
     if(call argAt(0) name == "method",
       route responseMethod := call evalArgAt(0),
-      call message arguments foreach(arg, route doMessage(arg))
-    )
-    self
-  )
-  as := method(name, route name := name; self)
+      call evalArgAt(0) foreach(k, v, route setSlot(k, v)))
+    self)
+  from := method(call delegateToMethod(self, "to"))
+  
+  ifHttpMethod := method(
+    route setHttpMethods(call message arguments)
+    self)
+  
+  as := method(name, route setName(name); self)
 )
 
 Route := Object clone do(
   name            ::= nil
   pattern         ::= nil
-  controller      ::= nil
-  action          ::= nil
+  controller      ::= "Application"
+  action          ::= "index"
   responseMethod  ::= nil
+  httpMethods     ::= {"GET", "POST", "PUT", "DELETE"}
 
   init := method(Generys routes append(self); self)
 
-  # Extracts ":something" from pattern (eg. "/admin/:section/:id") as RegexMatch
-  patternMatches := method(pattern matchesOfRegex("[:|\\*](\\w)+"))
+  # Extracts ":something" from pattern, ex.:
+  # list(":section", ":id") from "/admin/:section/:id"
+  patternMatches := method(
+    self patternMatches = pattern matchesOfRegex("[:|\\*](\\w)+"))
 
-  # Removes ":" from results of patterMatches, "section" and "id" in previous comment
-  namedParts := method(patternMatches map(part,
-    if(part hasSlot("at"), part at(0) exSlice(1))
-  ))
+  # Removes ":" from results of patterMatches, list("section" and "id") from previous comment
+  namedCaptures := method(
+    pattern ifNil(return list())
+    self namedCaptures = patternMatches() map(part,
+      if(part hasSlot("at"), part at(0) exSlice(1))))
 
-  # Maps namedParts to values from real path (ex. "/admin/prefs/2")
-  # section:="about", id:="2"
+  # Maps namedCaptures to values from real path (ex. "/admin/prefs/2")
+  # mapToPath("/admin/prefs/2") => {section:"prefs", id:"2"}
   mapToPath := method(path,
-    values := path allMatchesOfRegex(asRegex)
-    if(values hasSlot("at") and (values size > 0),
-      values = values at(0) ?captures ?exSlice(1),
-      values = List clone
-    )
-    Map clone addKeysAndValues(namedParts, values)
-  )
+    values := path allMatchesOfRegex(self asRegex)
+    if(values isKindOf(List) and (values size > 0),
+      values = values[0] ?captures ?exSlice(1),
+      values = list())
+
+    Map clone addKeysAndValues(self namedCaptures, values))
+
+  respondsTo := method(path,
+    captures := self mapToPath(path)
+    
+    path == self pattern or (captures values remove(nil) size > 0 and captures keys sort == self namedCaptures sort))
 
   asRegex := method(
-    # "*" at(0) == 42
-    if(pattern contains(42), 
-      replaceRegex := "([^\\?:]*)",
-      replaceRegex := "([^/\\?:]*)"
-    )
-    pattern := patternMatches replaceAllWith(replaceRegex)
-    if(pattern size == 1, return pattern asRegex)
-    if(pattern exSlice(-1) == "/", "#{pattern}?", "#{pattern}/?") interpolate asRegex
-  )
+    self pattern ifNil(return nil)
+    
+    replaceRegex := if(self pattern contains("*"[0]), "([^\\?:]*)", "([^/\\?:]*)")
+    re := self patternMatches replaceAllWith(replaceRegex)
+    re = if(re exSlice(-1) == "/", re .. "?", re .. "/?") asRegex
+    
+    self asRegex = re)
+
+  interpolate := method(
+    self pattern ifNil(return "")
+    context := call evalArgAt(0)
+    context isKindOf(Map) ifTrue(context = context asObject)
+    context ifNil(context = call sender)
+    
+    seq = pattern clone
+    self namedCaptures foreach(part,
+      seq replace(":" .. part, context perform(part))))
 )
