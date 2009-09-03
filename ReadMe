@@ -1,0 +1,50 @@
+=== Generys, wanna-be web framework for Io ===
+
+== What's the point? ==
+Mostly it was a personal goal to learn a bit more about this amazing
+language called Io. 
+Another goal was to create a simple web framework which could
+reliably serve lots of *data* -- no Views, templates, etc. -- all that can be done within browser,
+why should I waste my money on expensive servers?
+
+== How to use ==
+Explore. :)
+
+Place all your controllers into controllers/ and make sure you assign to
+a variable whose name ends with "Controller", like "CarsController := Controller clone do(..."
+
+== Model? ==
+Nothing for now.
+BUT there are plans to start work on CouchDB library,
+if you would like to help -- feel free to do so :)
+
+== How to run ==
+cd to Generys directory and then type "io" in console window.
+
+
+== Io additions ==
+To work more easily with Io, Generys has few tricks:
+You can use JSON syntax for Maps!
+Yes, this is valid Io code:
+  {colour: "Red", favourite: false}
+
+With a small twist, in order to create list you can also use
+curly brackets:
+  {1, 2, 3} == list(1, 2, 3)
+
+To access an item from Map or List you can use square brackets:
+ anMap["colour"] == anMap at("colour")
+ anMap["colour", "favourite"] == anMap select(key, value, key == "colour" or key == "favourite")
+ 
+ anList[0] == anList at(0)
+ anList[1,-1] == anList exSlice(1, -1)
+ 
+ "string"[0] == 115
+ "string"[0, 1] == "string" exSlice(0, 1)
+ 
+== Code conventions ==
+CodeConvetions := Object clone do ()
+method(argument,
+  if(iShouldSpareLinesOnClosingBrackets,
+    makeCodeLessLispy,
+    makeCodeMoreLispy))
