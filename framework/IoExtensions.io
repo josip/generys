@@ -14,6 +14,27 @@ Object do(
     )
 
     obj)
+    
+  around := method(slotName, beforeSlot, afterSlot,
+    originalSlot := self getSlot(slotName)
+    
+    self setSlot(slotName, block(
+      self perform(beforeSlot)
+      originalSlot
+      self perform(afterSlot)))
+    block(
+      if(beforeSlot isNil,
+        args := call evalArgs,
+        args := self performWithArgList(beforeSlot, call evalArgs))
+      
+      result  := self performWithArgList(slotName, args)
+      if(afterSlot isNil, result, self perform(afterSlot, result))))
+
+  before := method(slotName, beforeSlot,
+    self around(slotName, beforeSlot, nil))
+
+  after := method(slotName, afterSlot, 
+    self around(slotName, nil, afterSlot))
 
   asMap := method(
     slots := self slotNames map(slotName, self getSlot(slotName))
@@ -22,8 +43,7 @@ Object do(
   asJson := method(self asMap asJson)
 )
 
-# You probably don't want to leak your code
-# to outside world
+# You probably don't want to show your code to the world
 Block proto asJson := "null"
 nil asJson := "null"
 
@@ -34,7 +54,7 @@ nil asJson := "null"
 #   anMap["key1", "key2"] == anMap select(key, value, (key == "key1") or (key == "key2"))
 #   "string"[0] == 115
 #   "string"[0, 1] == "string" exSlice(0, 1)
-List proto squareBrackets := method(
+List proto squareBrackets := Map proto squareBrackets := method(
   evaled := call message argsEvaluatedIn(call sender)
   if(evaled size == 1,
     self at(evaled at(0))
@@ -50,8 +70,12 @@ nil ifFalse     := method(call evalArgAt(0))
 Message proto setArgAt := method(index, arg,
   self setArguments(self arguments clone atPut(index, arg)))
 
-Date proto asHTTPDate := method(
-  self asString("%a, %d %b %Y %H:%M:%S %Z"))
+Date proto do(
+  asHTTPDate := method(
+    self asString("%a, %d %b %Y %H:%M:%S %Z"))
+
+  asJson := method(self asString asJson)
+)
 
 Directory proto do(
   doFiles := method(

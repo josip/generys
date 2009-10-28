@@ -46,7 +46,7 @@ HTML := Object clone do(
   init := method(
     output = ""
     stack = List clone
-    log(debug := "HTML object is not too reliable!")
+    log debug("HTML object is not too reliable!")
   )
   
   parseAttributes := method(attrs,

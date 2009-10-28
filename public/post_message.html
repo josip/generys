@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Post new message</title>
+    <style type="text/css">
+      body {
+        background: #fff;
+        margin: 20px;
+      }
+      #sent {
+        font-weight: bold;
+        color: green;
+      }
+    </style>
+    <script src="/jquery-1.3.2.min.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" charset="utf-8">
+      $(function () {
+        $("#post").click(function () {
+          $.get("/_message", {body: $("#message_body").val()}, function () {
+            $("#sent").stop().fadeIn();
+            setTimeout(function () { $("#sent").fadeOut(); }, 240);
+          });
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <form action="/_message" method="get">
+      <label for="body">Message:</label>
+      <input type="text" name="body" id="message_body"/>
+      <input type="button" value="Send" id="post" />
+      <div id="sent" style="display:none">Sent!</div>
+    </form>
+  </body>
+</html>

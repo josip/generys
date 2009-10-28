@@ -8,16 +8,7 @@ Router := Object clone do (
   PUT     := method(self connect(call evalArgAt(0)) ifHttpMethod("PUT"))
   DELETE  := method(self connect(call evalArgAt(0)) ifHttpMethod("DELETE"))
 
-  resource := method(name,
-    controllerPath := ("/" .. name .. "s") asLowercase
-    resourcePath :=  ("/" .. name .. "/:id") asLowercase
-    name = name .. "s"
-    
-    GET(controllerPath)   from({controller: name,   action: "index"})
-    POST(controllerPath)  to({controller: name,     action: "create"})
-    GET(resourcePath)     from({controller: name,   action: "show"})
-    PUT(resourcePath)     to({controller: name,     action: "update"})
-    DELETE(resourcePath)  from({controller: name,   action: "destroy"}))
+  resource := method(name, ResourceMatch cloneWithoutInit setName(name) init)
 
   defaultRoutes := method(
     connect("/:controller/:action/:id.:format") to({controller: ":controller", action: ":action"})
@@ -49,6 +40,29 @@ RouteMatch := Object do (
     self)
   
   as := method(name, route setName(name); self)
+)
+
+ResourceMatch := Object clone do(
+  name           ::= nil
+  controllerPath ::= nil
+  resourcePath   ::= nil
+  
+  init := method(resourceName,  
+    controllerPath = ("/" .. name .. "s") asLowercase
+    resourcePath =  ("/" .. name .. "/:id") asLowercase
+    nameSingular := name
+    name = name .. "s"
+    
+    Router GET(controllerPath)   from({controller: name,   action: "index"})    as("list" .. name)
+    Router POST(controllerPath)  to({controller: name,     action: "create"})   as("create" .. nameSingular)
+    Router GET(resourcePath)     from({controller: name,   action: "show"})     as("show" .. nameSingular)
+    Router PUT(resourcePath)     to({controller: name,     action: "update"})   as("update" .. nameSingular)
+    Router DELETE(resourcePath)  from({controller: name,   action: "destroy"})  as("destroy" .. nameSingular)
+    
+    self)
+
+  hasOne := method(self)
+  hasMany := method(self)
 )
 
 Route := Object clone do(

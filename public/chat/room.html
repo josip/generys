@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="/chat/style.css" type="text/css" media="screen" charset="utf-8"/>
+    <script src="/jquery-1.3.2.min.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" charset="utf-8">
+      var Chat = {
+        submit: function () {
+          Chat.post($("#message").val());
+          $("#message").val("")[0].focus();
+        },
+        post: function(message) {
+          // For some reason in Firefox 3.5.3 POST is not working properly
+          // Firebug says that message value has been appended to the request
+          // while Io thinks otherwise.
+          $.get("/chat/post", {message: message});
+          this.showMessage({created_at: new Date(), body: message, user: "(me)"});
+        },
+        showMessage: function(msg) {
+          var $msg = $("#message_template").clone();
+          if(msg.user === "(me)")
+            $msg.addClass("my");
+          else
+            $msg.removeClass("my");
+
+          $msg.find(".nick").text(msg.user);
+          $msg.find(".body").text(msg.body);
+          $msg.show();
+          
+          $("#messages").append($msg);
+          delete $msg;
+        },
+        poll: function () {
+          $.post("/chat/updates", function (updates) {
+            if(!updates.length)
+              setTimeout(Chat.poll, 120);
+
+            var messages = JSON.parse(updates);
+            for(var n = 0, m = messages.length; n < m; n++)
+              Chat.showMessage(messages[n]);
+            
+            setTimeout(Chat.poll, 1);
+          }, function () { setTimeout(Chat.poll, 360); });
+        }
+      };
+
+      $(function () {
+        $("#submit").click(Chat.submit);
+        $("#message").keyup(function (e) {
+          if(e.keyCode == 13) Chat.submit();
+        });
+        
+        setTimeout(Chat.poll, 360);
+      });
+    </script>
+  </head>
+  <body>
+    <div id="messages">
+      
+    </div>
+    <input type="text" id="message"/><input type="button" value="&#x23CE;" id="submit"/>
+    <div id="message_template" class="message" style="display:none">
+      <span class="nick"></span>: <span class="body"></span>
+    </div>
+  </body>
+</html>

@@ -43,8 +43,18 @@ To access an item from Map or List you can use square brackets:
  "string"[0, 1] == "string" exSlice(0, 1)
  
 == Code conventions ==
-CodeConvetions := Object clone do ()
+CodeConvetions := Object clone do (
 method(argument,
   if(iShouldSpareLinesOnClosingBrackets,
     makeCodeLessLispy,
-    makeCodeMoreLispy))
+    makeCodeMoreLispy)
+    
+  if(iShouldBreakLongStatements,
+    firstBlock()
+    callThis()
+  ,
+    secondBlock()
+    callThat()))
+
+  botNotTooLispy := true
+)

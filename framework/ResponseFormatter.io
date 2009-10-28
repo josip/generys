@@ -10,11 +10,11 @@ ResponseFormatter := Object clone do(
 # Note that first defined formatter will be tested last
 ResponseFormatter clone do(
   respondsToTypes = {"Error", "Exception"}
-  format := method(error, resp,
+  format := method(error, resp, req,
     (error type == "Exception") ifTrue(error = error error)
     error isKindOf(Sequence) ifTrue(error = Error with(error))
     
-    excpCtrl := Generys ExceptionsController clone setResponse(resp)
+    excpCtrl := Generys ExceptionsController clone setRequest(req) setResponse(resp)
     if(excpCtrl hasSlot(error message),
       log error("Activating handler for '#{error message}' exception")
       excpCtrl perform(error message, error)
@@ -27,7 +27,7 @@ ResponseFormatter clone do(
   respondsToType = "File"
   format := method(file, resp,
     if(Generys config ?useXSendfileHeader,
-      resp contentType = nil
+      resp contentType = ""
       resp setHeader("X-Sendfile", file path)
       return ""
     ,
@@ -38,15 +38,38 @@ ResponseFormatter clone do(
         log error("Streaming file with unknown extension (#{file path})"))
       resp setHeader("Last-Modified", file lastDataChangeDate asHTTPDate)
 
-      # Writes HTTP headers
+      # Write HTTP headers
       resp send
       
       file streamTo(resp socket)
       
-      # We need to override send method which
-      # would otherwise add HTTP headers again
-      # at the end of the file
+      # We need to override -send method which
+      # would otherwise append HTTP headers to both
+      # beninning and the end of the file
       resp send = block(file close)
+      return "")))
+
+ResponseFormatter clone do(
+  respondsToType = "nil"
+  format := method(nothing, resp,
+    return ""))
+
+ResponseFormatter clone do(
+  respondsToTypes = {"true", "false"}
+  format := method(state, resp,
+    if(state, resp statusCode = 200, resp statusCode = 500)
+    ""))
+
+ResponseFormatter clone do(
+  respondsToType = "FutureResponse"
+  format := method(futureResp, resp,
+    if((Generys futureResponses hasKey(futureResp name)) and (futureResp queue isEmpty not),
+      futureResp setSocket(resp socket) prepareData
+    ,
+      Generys futureResponses atPut(futureResp name, futureResp)
+      resp socket _close := resp socket getSlot("close")
+      resp socket setSlot("close", method())
+      futureResp setSocket(resp socket)
       return "")))
 
 ResponseFormatter clone do(
@@ -56,5 +79,5 @@ ResponseFormatter clone do(
     obj asJson))
 
 ResponseFormatter clone do(
-  respondsToType = "Sequence"
+  respondsToTypes = {"Sequence", "Number"}
   format := method(str, resp, str))

@@ -5,7 +5,8 @@ list("framework/", "lib/") foreach(path, Importer addSearchPath(path))
 Generys do(
   root := Directory currentWorkingDirectory asString
   publicDir := Generys root .. "/public"
-  config do(doFile("config/default.json") asObject)
+  env := "dev"
+  config do(doFile("config/environment/" .. (Generys env) .. ".json") asObject)
 )
 
 doFile("config/routes.io")
