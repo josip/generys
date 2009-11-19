@@ -1,0 +1,13 @@
+// NOTE: This will be parsed as Io an file.
+{
+  host:               "127.0.0.1",
+  port:               4000,
+  sessionStore:       "Map",
+  sessionCookieName:  "_s",
+  // If you are using Cherokee web server (and you should!)
+  // you can set this to +true+ as Cherokee will take care of
+  // presenting the file to the user while saving Generys from all the hard work
+  useXSendFileHeader: false,
+  logLevel:           "debug",
+  logFile:            null
+}

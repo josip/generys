@@ -1,0 +1,63 @@
+body {
+  font-family: Verdana;
+  font-size: 16px;
+  color: #000;
+  margin: 20px auto;
+  padding: 0;
+  width: 500px;
+}
+
+#messages {
+  height: 300px;
+  overflow: auto;
+  border: 1px solid #ddd;
+  font-size: 13px;
+}
+
+#message {
+  width: 460px;
+}
+
+.message {
+  border-bottom: 1px solid #ddd;
+  padding: 3px 0;
+}
+
+.message.my {
+  background-color: #ffa;
+}
+
+.message .nick {
+  display: inline-block;
+  width: 100px;
+  text-align: right;
+  font-size: 10px;
+}
+
+.message .body {
+  display: inline-block;
+  width: 370px;
+}
+
+
+.error {
+  padding: 5px;
+  background: #f00;
+  color: #fff;
+  font-size: 0.8em;
+}
+
+label {
+  width: 200px;
+  display: block;
+}
+
+form {
+  border: 1px solid #c0c0c0;
+  padding: 5px;
+}
+
+input[type=submit] {
+  display: block;
+  margin: 5px auto;
+}

@@ -1,0 +1,74 @@
+#!/usr/bin/env io
+
+Menu := Object clone do(
+  init := method(
+    options := System getOptions(System args)
+    
+    #(options keys size < 2) ifTrue(return self r(options keys at(1)))
+    options foreach(k, v,
+      self hasSlot(k exSlice(1)) ifTrue(
+        self perform(k exSlice(1), v)))
+    
+    options hasKey("r") ifFalse(self r(options keys at(1))))
+  
+  config := Object clone do(env := "dev")
+  s   := method(host, self config host := host)
+  p   := method(port, self config port ::= port asNumber)
+  pp  := method(path, self config urlPrefixPath := path)
+  e   := method(env,  self config env = env)
+  l   := method(path, self config logFile := path)
+
+  numberOfInstances ::= 1
+  n := method(n, self setNumberOfInstances(n asNumber))
+
+  # Run with root path
+  r := method(path,
+    if(path, Directory setCurrentWorkingDirectory(Path absolute(path)))
+    
+    " - In #{Directory currentWorkingDirectory}" interpolate println
+    loader := File with("main.io")
+    loader exists ifFalse(
+      return(" ! This is not a Generys directory (or main.io is missing)" println))
+    
+    if(self numberOfInstances == 1,
+      doFile("main.io")
+      Generys config = self config appendProto(Generys config)
+      Generys run
+    ,
+      self config hasSlot("port") ifFalse(self config port ::= 4000)
+      self numberOfInstances repeat(n,
+        threadConf := self config clone
+        threadConf = threadConf setPort(threadConf port + n) serialized
+        threadCode := Sequence clone appendSeq(\
+          "Directory setCurrentWorkingDirectory(\"", Directory currentWorkingDirectory, "\")\n",\
+          "doFile(\"main.io\")\n",\
+          "_config := ", threadConf,\
+          "Generys config = _config appendProto(Generys config)\n",\
+          "Generys run")
+        Thread createThread(threadCode))
+
+      while(Thread threadCount > 1, System sleep(5))
+    ))
+
+  # Install to path
+  i := method(path,
+    path := Directory with(Path absolute(path))
+    path exists ifTrue(return "Directory #{path path} already exists!" interpolate println)
+    
+    path create
+    skeletonDir := System ioPath .. "/addons/Generys/skeleton"
+    System system("cp -R #{skeletonDir}/ #{path path}" interpolate)
+    "- Copied Generys files to #{path}")
+  
+  # Version
+  v := method(
+    "Hi, my name is Generys and I'm #{Generys version} years old." interpolate println
+    System exit)
+
+  # Help
+  h := method(
+    self slotNames join(", ") println
+    System exit)
+)
+
+Menu clone
