@@ -76,6 +76,9 @@ ResourceMatch := Object clone do(
     Router PUT(resourcePath)     to({controller: name,     action: "update"})   as("update" .. nameSingular)
     Router DELETE(resourcePath)  from({controller: name,   action: "destroy"})  as("destroy" .. nameSingular)
     
+    Router connect(controllerPath .. "/:action") to({controller: name, action: "#{action}"})
+    Router connect(resourcePath .. "/:action") to({controller: name, action: "#{action}"})
+
     self)
 
   hasOne := method(resourceName, self)
