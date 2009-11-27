@@ -1,4 +1,4 @@
-Person := CouchDocTemplate setup(  
+Person := CouchDocTemplate setup(
   property("nick")
   property("email")
   property("password")

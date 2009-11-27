@@ -4,5 +4,5 @@ Router do (
   # use resource() or connect() to allow only specific methods
   
   defaultRoutes
-  fileServerRoute
+  fileServerRoutes
 )

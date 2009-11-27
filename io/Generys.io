@@ -122,8 +122,8 @@ Generys := HttpServer clone do (
       obj ?doBeforeFilters(args)
       if(slotIsBlock,
         slotResp = obj ?performWithArgList(slotName, args),
-        slotResp = obj getSlot(slotName) ?interpolate(args asObject))
-      obj ?doAfterFilters
+        slotResp = obj getSlot(slotName) /*?interpolate(args asObject)*/)
+      obj ?doAfterFilters([slotResp])
       obj ?session ?save)
     
     e catch(Exception,
