@@ -7,13 +7,13 @@ Installing Generys
  
 Creating new Generys project
 ----------------------------
-From terminal run:
-  `$ generys -i=ProjectName`
+From terminal run:  
+`generys -i=ProjectName`
 
-And then
-  `$ generys -r=ProjectName`
-or
-  `$ cd ProjectName`  
-  `$ generys`
+And then:
+`generys -r=ProjectName`
+or simply:
+`cd ProjectName
+generys`
 
 For list of available switches take a look into binaries/generys (within this repo, it's just an Io file)

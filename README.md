@@ -39,13 +39,13 @@ Yes, this is a valid Io code:
  `{colour: "Red", favourite: false, numbers:[1, 2, 3]}`
 
 To access an item from Map or List you can use square brackets:
- `anMap["colour"] == anMap at("colour")
- anMap["colour", "favourite"] == anMap select(key, value, key == "colour" or key == "favourite")`  
-
- `anList[0] == anList at(0)
- anList[1,-1] == anList exSlice(1, -1)`  
-
- `"string"[0] == 115
+ `anMap["colour"] == anMap at("colour")  
+ anMap["colour", "favourite"] == anMap select(key, value, key == "colour" or key == "favourite")  
+  
+ anList[0] == anList at(0)  
+ anList[1,-1] == anList exSlice(1, -1)  
+  
+ "string"[0] == 115  
  "string"[0, 1] == "string" exSlice(0, 1)`
 
 == Code conventions ==
