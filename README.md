@@ -34,11 +34,11 @@ You can also, run `generys -r=/path/to/project`, assuming you've installed gener
 Io additions
 ------------
 To work more easily with Io, Generys has few tricks:
-1. First of all, you can use JSON syntax for Maps!
+### First of all, you can use JSON syntax for Maps!
 Yes, this is a valid Io code:  
-`{colour: "Red", favourite: false, numbers:[1, 2, 3]}`
+`{colour: "Red", favourite: false, numbers:[1, 2, 3]}`  
 
-2. To access an item from Map or List you can use square brackets:  
+### To access an item from Map or List you can use square brackets:  
 `anMap["colour"] == anMap at("colour")`  
 `anMap["colour", "favourite"] == anMap select(key, value, key == "colour" or key == "favourite")`
   
@@ -51,23 +51,23 @@ Yes, this is a valid Io code:
 Code conventions
 ----------------
 Just to make it more fun, all closing brackets are in the same line:  
-`lispy := method(
-  self isThisLispInspired ifTrue(
-  Yes, it is!" println))`
+`lispy := method(`  
+`  self isThisLispInspired ifTrue(`  
+`  Yes, it is!" println))`  
   
 With one exception:
-`Object clone do(
-  ...
-)`  
+`Object clone do(`  
+`  ...`  
+`)`  
 
 "Class" variables have are addressed with `self` before, just to differentiate them from "instance" variables.
-`Car := Object clone do(
-  a := 4
-  b := 5
+`Car := Object clone do(`  
+`  a := 4`  
+`  b := 5`  
   
-  switchPlaces := method(
-    c := self a
-    self a = self b
-    self b = c
-    self)
+`  switchPlaces := method(`  
+`    c := self a`  
+`    self a = self b`  
+`    self b = c`  
+`    self)`  
 )`
