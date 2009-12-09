@@ -8,7 +8,7 @@
   // If you are using Cherokee web server (and you should!)
   // you can set this to +true+ as Cherokee will take care of
   // presenting the file to the user while saving Generys from all of the hard work
-  useXSendFileHeader:  true,
+  useXSendfileHeader:  false,
   // Setting to +nil+ will leave X-Powered-By header empty
   poweredByHeader: "Io/" .. System version
 }
