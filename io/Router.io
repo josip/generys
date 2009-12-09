@@ -39,14 +39,6 @@ RouteMatch := Object do (
     route setHttpMethods(call message arguments)
     self)
   
-/*  redirectTo := method(path, statusCode,
-    statusCode ifNil(statusCode = 302)
-    route setResponseMethod(block(request, response,
-      response setStatusCode(statusCode) setHeader("Location", Generys serverUrl .. "/" .. path)
-      "")
-    
-    self))
-*/
   as := method(name, route setName(name); self)
 )
 
@@ -115,7 +107,8 @@ Route := Object clone do(
 
     Map clone addKeysAndValues(self namedCaptures, values))
 
-  respondsTo := method(path,
+  respondsTo := method(path, httpMethod,
+    if(httpMethod, self httpMethods contains(httpMethod) ifFalse(return false))
     captures := self mapToPath(path)
 
     # Do not ask what this does

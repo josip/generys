@@ -20,6 +20,12 @@ Controller := Object clone do (
     
     Generys controllers appendIfAbsent(self))
   
+  private := method(
+    self setSlot = self updateSlot = method(name, value,
+      self privateSlots appendIfAbsent(name)
+      super(name, value))
+    )
+  
   beforeFilter := method(filter, options, 
     options ifNil(options = Map clone)
     self beforeFilters append(options merge({filter: filter})))

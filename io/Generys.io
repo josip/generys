@@ -67,7 +67,7 @@ Generys := HttpServer clone do (
   )
 
   dispatch := method(req, resp, candidateAt,
-    candidates := routes select(respondsTo(req path))
+    candidates := routes select(respondsTo(req path, req requestMethod))
     candidates isEmpty ifTrue(return Error with("noRoute"))
     
     candidateAt ifNil(candidateAt = 0)
@@ -86,12 +86,10 @@ Generys := HttpServer clone do (
       mappedValues atPut("response",  resp)
     ,
       controllerName := route controller interpolate(mappedValues asObject)
-      #(controllerName[0] == ":"[0]) ifTrue(
-      #  controllerName = mappedValues[controllerName exSlice(1)])
       obj = Generys controllers[controllerName]
 
       obj ifNil(
-        log debug("Route #{route} requires non-existing controller '#{controllerName}'")
+        log error("Route #{route} requires non-existing controller '#{controllerName}'")
         return Error with("noController"))
 
       slotName = route action interpolate(mappedValues asObject)
