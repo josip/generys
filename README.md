@@ -34,25 +34,25 @@ You can also, run `generys -r=/path/to/project`, assuming you've installed gener
 Io additions
 ------------
 To work more easily with Io, Generys has few tricks:
-You can use JSON syntax for Maps!
+1. You can use JSON syntax for Maps!
 Yes, this is a valid Io code:
-  `{colour: "Red", favourite: false, numbers:[1, 2, 3]}`
+ `{colour: "Red", favourite: false, numbers:[1, 2, 3]}`
 
 To access an item from Map or List you can use square brackets:
  `anMap["colour"] == anMap at("colour")
- anMap["colour", "favourite"] == anMap select(key, value, key == "colour" or key == "favourite")
- 
- anList[0] == anList at(0)
- anList[1,-1] == anList exSlice(1, -1)
- 
- "string"[0] == 115
+ anMap["colour", "favourite"] == anMap select(key, value, key == "colour" or key == "favourite")`  
+
+ `anList[0] == anList at(0)
+ anList[1,-1] == anList exSlice(1, -1)`  
+
+ `"string"[0] == 115
  "string"[0, 1] == "string" exSlice(0, 1)`
- 
+
 == Code conventions ==
 Just to make it more fun, all closing brackets are in the same line:
-`  lispy := method(
-    self isThisLispInspired ifTrue(
-      Yes, it is!" println))`
+`lispy := method(
+  self isThisLispInspired ifTrue(
+  Yes, it is!" println))`
 
 With one exception:
 `Object clone do(

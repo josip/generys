@@ -13,7 +13,7 @@ From terminal run:
 And then
   `$ generys -r=ProjectName`
 or
-  `$ cd ProjectName`
+  `$ cd ProjectName`  
   `$ generys`
-  
+
 For list of available switches take a look into binaries/generys (within this repo, it's just an Io file)
