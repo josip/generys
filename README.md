@@ -34,11 +34,11 @@ You can also, run `generys -r=/path/to/project`, assuming you've installed gener
 Io additions
 ------------
 To work more easily with Io, Generys has few tricks:
-First of all, you can use JSON syntax for Maps!
-Yes, this is a valid Io code:
+1. First of all, you can use JSON syntax for Maps!
+Yes, this is a valid Io code:  
 `{colour: "Red", favourite: false, numbers:[1, 2, 3]}`
 
-To access an item from Map or List you can use square brackets:
+2. To access an item from Map or List you can use square brackets:  
 `anMap["colour"] == anMap at("colour")`  
 `anMap["colour", "favourite"] == anMap select(key, value, key == "colour" or key == "favourite")`
   
