@@ -10,7 +10,7 @@ Channel := Object clone do(
 
     cache append(message)
     if(cache size == cacheSize, cache removeFirst)
-    
+
     message)
 
   streamFor := method(futureRespId, subscribers select(name == futureRespId) at(0))

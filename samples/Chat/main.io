@@ -11,4 +11,4 @@ Generys do(
   loadConfig
 )
 
-if(System launchScript and(System launchScript containsSeq("main.io")), Generys run)
+if(System launchScript ?containsSeq("main.io"), Generys run)
