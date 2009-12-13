@@ -71,7 +71,7 @@ Controller := Object clone do (
   redirectTo := method(url, anStatusCode,
     # 302 = Temporary redirect
     anStatusCode ifNil(anStatusCode = 302)
-    statusCode(anStatusCode)
+    setStatusCode(anStatusCode)
     
     #url containsSeq("http") ifFalse(url = Generys serverURL .. Generys config urlPrefixPath .. url)
     response setHeader("Location", url)
