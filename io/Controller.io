@@ -56,7 +56,7 @@ Controller := Object clone do (
   isHEAD        := lazySlot(request requestMethod == "HEAD")
   isAjaxRequest := lazySlot(request headers["x-requested-with"] asLowercase == "xmlhttprequest")
 
-  statusCode := method(code, response statusCode = code; self)
+  setStatusCode := method(code, response statusCode = code; self)
 
   cacheFor := method(dur,
     response setHeader("Cache-Control", "max-age=" .. dur .. ", must-revalidate"))

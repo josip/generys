@@ -1,6 +1,6 @@
 Generys ExceptionsController do(
   notFound := method(e,
-    statusCode(404)
+    setStatusCode(404)
     "<h1>Not found (e#404)</h1>")
   noSlot := getSlot("notFound")
   noRoute := getSlot("notFound")
