@@ -52,22 +52,22 @@ Code conventions
 ----------------
 Just to make it more fun, all closing brackets are in the same line:  
 `lispy := method(`  
-`  self isThisLispInspired ifTrue(`  
-`  Yes, it is!" println))`  
+`	self isThisLispInspired ifTrue(`  
+`	Yes, it is!" println))`  
   
 With one exception:
 `Object clone do(`  
-`  ...`  
+`	...`  
 `)`  
 
-"Class" variables have are addressed with `self` before, just to differentiate them from "instance" variables.
+"Class" variables are addressed with `self` before, just to differentiate them from "instance" variables.
 `Car := Object clone do(`  
-`  a := 4`  
-`  b := 5`  
+`	a := 4`  
+`	b := 5`  
   
-`  switchPlaces := method(`  
-`    c := self a`  
-`    self a = self b`  
-`    self b = c`  
-`    self)`  
+` switchPlaces := method(`  
+`		c := self a`  
+`		self a = self b`  
+`		self b = c`  
+`		self)`  
 `)`
