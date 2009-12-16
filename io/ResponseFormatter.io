@@ -25,9 +25,9 @@ ResponseFormatter clone do(
       log error("Activating handler for '#{name}' exception")
       excpCtrl perform(name, error)
     ,
-      log error("No handler for \"#{name}\" exception; showing exception to user")
-      resp status = 500
-      "An unknow error occured:<br/><pre>#{error}</pre>" interpolate)))
+      log error("No handler for \"#{name}\" exception")
+      excpCtrl noExceptionHandler(error)
+    )))
 
 ResponseFormatter clone do(
   respondsToType = "File"

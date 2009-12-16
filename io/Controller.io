@@ -20,11 +20,16 @@ Controller := Object clone do (
     
     Generys controllers appendIfAbsent(self))
   
-  private := method(
-    self setSlot = self updateSlot = method(name, value,
-      self privateSlots appendIfAbsent(name)
-      super(name, value))
-    )
+  # TODO: Move all the rendering code (formatResponse etc.) from Generys
+  # to Controller, that will allow re-rendering the controller from within
+  # ResponseFormatters themselves (usecase: Exceptions ResponseFormatter) 
+  #render := method()
+  
+  #private := method(
+  #  self setSlot = self updateSlot = method(name, value,
+  #    self privateSlots appendIfAbsent(name)
+  #    super(name, value))
+  #  )
   
   beforeFilter := method(filter, options, 
     options ifNil(options = Map clone)
