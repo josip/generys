@@ -1,6 +1,6 @@
 Router do (
-  # Take a peek into Router.io to understand some of the black magick
-  # which is manifested below
+  # Take a peek into Generys/io/Router.io to understand some of the black magick
+  # which manifested below
   
   connect("/_:action")     to({controller: "Debug", action: "#{action}"})
   
@@ -11,6 +11,6 @@ Router do (
   connect("/chat/post")     to({controller: "Chat", action: "post"})
   connect("/chat/updates")  to({controller: "Chat", action: "updates"})
   
-  connect("/")              to({controller: "StaticPages"})
+  connect("/")              to({controller: "StaticPages"}) as("root")
   fileServerRoutes
 )

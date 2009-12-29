@@ -17,13 +17,16 @@ CouchDB := Object clone do(
     (path[0] == "/"[0]) ifTrue(path = path exSlice(1))
     if(options isNil,
       options = "",
-      
       options = "?" .. options asQueryString)
     
-    response := URL with(self url .. path) fetch
+    e := try(
+      response := URL with(self url .. path) fetch)
+    e catch(
+      CouchDbException clone setIsConnectError(true) raise)
+
     CouchDoc from(Yajl parseJson(response)) setDb(self))
-  squareBrackets := method(path, options, at(path, options))
-  
+  squareBrackets := getSlot("at")
+
   atPut := method(id, doc,
     if((doc isNil) and (id isKindOf(Map)),
       doc = CouchDoc from(id) setDb(self)

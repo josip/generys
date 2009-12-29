@@ -33,7 +33,7 @@ Menu := Object clone do(
     if(self numberOfInstances == 1,
       doFile("main.io")
       Generys config = self config appendProto(Generys config)
-      Generys run
+      Generys serve
     ,
       self config hasSlot("port") ifFalse(self config port ::= 4000)
       self numberOfInstances repeat(n,
@@ -44,7 +44,7 @@ Menu := Object clone do(
           "doFile(\"main.io\")\n",\
           "_config := ", threadConf,\
           "Generys config = _config appendProto(Generys config)\n",\
-          "Generys run")
+          "Generys serve")
         Thread createThread(threadCode))
 
       while(Thread threadCount > 1, System sleep(5))

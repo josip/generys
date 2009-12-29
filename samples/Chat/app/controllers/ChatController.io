@@ -1,7 +1,8 @@
 ChatController := Controller clone do(
   beforeFilter("dontCache")
-  beforeFilter("requireAuth", {except: ["index", "login", "register"]})
+  beforeFilter("requireAuth", {except: ["index", "login", "register", "updates"]})
  
+
   index := method(
     if(isLoggedIn, File with("static/chat/room.html"), redirectToRoute("login")))
   
@@ -11,7 +12,7 @@ ChatController := Controller clone do(
     user := Person create({_id: email, email: email, nick: nick, password: password, logins:[]})
     
     login(email, password))
-  
+
   login := method(email, password,
     isGET ifTrue(return File with("static/chat/login.html"))
     
@@ -19,24 +20,32 @@ ChatController := Controller clone do(
     if(user not, Exception raise("authFailure"))
     
     session user := user
-    Channel subscribers push(createFutureResponse("channel"))
+    #Channel subscribers append(self createFutureResponse("channel"))
     redirectTo("/chat"))
 
   logout := method(
-    Channel streamFor(session channelFutureId) ?close
+    Channel streamFor(self streamId) ?close
     destroySession
 
-    redirectToRoute("login"))
+    redirectToRoute("root"))
   
-  post := method(message,
-    message = ChatMessage create({created_at: Date now, body: message, user_id: session user id})
-    message atPut("user_nick", session user["nick"])
-    Channel post(message, [session channelFutureId]) isNil ifFalse(message asJson))
+  post := method(body,
+    msg := ChatMessage create({created_at: Date now, body: body, user_id: session user id})
+    msg atPut("user_nick", self session user["nick"])
+    Channel send(msg asJson, [self streamId])
+    msg)
 
-  updates := method(Channel streamFor(session channelFutureId))
+  updates := method(
+    Channel streamFor(self streamId) returnIfNonNil
+    
+    if(self isWebSocket,
+      self webSocket := client := self createWebSocket(self streamId, ChatWebSocketHandler clone),
+      client := self createFutureResponse(self streamId))
+
+    Channel subscribe(client))
 
 ### Private slots ###
-
+  streamId := method("chat-stream-for-" .. (self session sessionId))
   isLoggedIn := method(session ?user isNil not)
 
   requireAuth := method(

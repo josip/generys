@@ -22,7 +22,7 @@ Generys ExceptionsController do(
     session returnTo := request path
     redirectToRoute("login"))
 
-  authFailure := method(
+  authFailure := lazySlot(
     view("static/chat/login.html") do(
       findFirst("form")\
         insertAfter("""<div class="error">Please check your email & password.</div>""")

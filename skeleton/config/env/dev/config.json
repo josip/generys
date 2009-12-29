@@ -9,5 +9,5 @@
   // presenting the file to the user while saving Generys from all the hard work
   useXSendfileHeader: false,
   logLevel:           "debug",
-  logFile:            null
+  logFile:            nil
 }

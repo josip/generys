@@ -7,8 +7,6 @@ Generys do(
   root      := Directory currentWorkingDirectory
   staticDir := Generys root .. "/static"
   tmpDir    := Generys root .. "/tmp"
-  
-  loadConfig
 )
 
-if(System launchScript ?containsSeq("main.io"), Generys run)
+if(System launchScript ?containsSeq("main.io"), Generys serve)

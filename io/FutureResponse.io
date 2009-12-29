@@ -4,16 +4,18 @@ FutureResponse := Object clone do(
   body        ::= nil
   queue       ::= nil
   limit       ::= 1
-  
+
   init := method(
-    log debug("Created new FutureResponse")
-    self queue = []; self)
+    self queue = []
+    self)
 
-  append := method(msg, self queue append(msg); self)
-  push := getSlot("append")
+  send := method(msg, self queue append(msg); self)
   
-  at := method(name, Generys futureResponses[name])
-
+  prepareData := method(
+    data := "[" .. (self queue join(",")) .. "]"
+    self queue removeAll
+    data)
+  
   close := method(
     log debug("Closed FutureResponse '#{self name}'")
     self closeSocket
@@ -23,11 +25,6 @@ FutureResponse := Object clone do(
     self socket ?_close; self socket ?close
     self socket = nil
     self)
-  
-  prepareData := method(
-    data := self queue asJson
-    self queue removeAll
-    data)
   
   flush := method(
     if(self ?socket isOpen,

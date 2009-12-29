@@ -11,17 +11,30 @@
           $("#message").val("")[0].focus();
         },
         post: function(message) {
-          // For some reason in Firefox 3.5.3 POST is not working properly
-          // Firebug says that message value has been appended to the request
-          // while Io thinks otherwise.
-          $.get("/chat/post", {message: message});
-          this.showMessage({created_at: new Date(), body: message, user_id: "(me)", user_nick: "(me)"});
+          if(this.socket) {
+            this.post = function (msg) {
+              this.socket.send(JSON.stringify({body: msg}));
+            }
+          } else {
+            // For some reason in Firefox 3.5.3 POST is not working properly
+            // Firebug says that message value has been appended to the request
+            // while Io thinks otherwise.
+            this.post = function (msg) {
+              $.getJSON("/chat/post", {body: msg}, function (msg) {
+                Chat.myNick = msg.user_nick;
+              });
+              Chat.showMessage({user_nick: "(me)", body: msg});
+            }
+          }
+
+          this.post(message);
         },
         showMessage: function(msg) {
           var $msg = $("#message_template").clone();
-          if(msg.user_nick === "(me)")
+          if(msg.user_nick === this.myNick || msg.user_nick === "(me)") {
+            msg.user_nick = "(me)";
             $msg.addClass("my");
-          else
+          } else
             $msg.removeClass("my");
 
           $msg.find(".nick").text(msg.user_nick);
@@ -51,7 +64,23 @@
           if(e.keyCode == 13) Chat.submit();
         });
         
-        setTimeout(Chat.poll, 360);
+        if("WebSocket" in window) {
+          Chat.socket = new WebSocket("ws://127.0.0.1:4000/chat/updates");
+          Chat.socket.onmessage = function (e) {
+            if(e.auth) {
+              Chat.myNick = e.user.nick;
+            } else {
+              Chat.showMessage(JSON.parse(e.data));
+            }
+          };
+          setTimeout(function () {
+            Chat.socket.send(JSON.stringify({
+              sessionId: document.cookie.match(/_s\=(.+);?/)[1]
+            }));
+          }, 360);
+        } else {
+          setTimeout(Chat.poll, 360);
+        }
       });
       
       $(window).unload(function () {

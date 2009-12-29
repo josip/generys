@@ -16,7 +16,7 @@ SelectorDecomposer := Object clone do(
     tag     := "^((?:[\\w\\*-]|\\\\.)+)" asRegex
   )
   
-  # Note: It appears that implementing cache would actually would
+  # Note: It appears that implementing cache actually would
   # only slow down the process, apparently reading from Map/Object is quite slower (2x) than
   # matching five Regexp-es (4 selectors + chunker)
   decompose := method(selector,
@@ -52,15 +52,15 @@ SGMLElement do(
     reqClasses  := selector at("classes")
     reqAttrs    := selector at("attributes")
     
-    if(reqId and (self attribute("id") != reqId), return false)
-    if(reqTag and(self name != reqTag), return false)
+    if(reqId and (self attribute("id") != reqId), return(false))
+    if(reqTag and(self name != reqTag), return(false))
     
     reqClasses isEmpty ifFalse(
       elClasses := self attribute("class") ?splitNoEmpties(" ") ?sort
-      (elClasses == reqClasses) ifFalse(return false))
+      (elClasses == reqClasses) ifFalse(return(false)))
 
-    (reqAttrs keys size > self attributes size) ifTrue(return false)
-    reqAttrs map(k, v, self attribute(k) == v) contains(false) ifTrue(return false)
+    (reqAttrs keys size > self attributes size) ifTrue(return(false))
+    reqAttrs map(k, v, self attribute(k) == v) contains(false) ifTrue(return(false))
 
     true)
 
@@ -85,7 +85,8 @@ SGMLElement do(
   findFirst := method(query, self find(query) at(0))
   
   adopt := method(el,
-    el asHTML subitems mapInPlace(setParent(self parent)))
+    (el type == "Sequence") ifTrue(el = el asHTML)
+    el subitems mapInPlace(setParent(self parent)))
     
   append := method(el,
     self adopt(el) foreach(el, self subitems append(el))
@@ -98,15 +99,18 @@ SGMLElement do(
 
   prev := method(move,
     move ifNil(move = 1)
+    
     el := self parent subitems at(self positionInParent - move)
-    el ifNil(return nil)
-    if(el name isNil, prev(move + 1), el))
+    el ifNil(return(nil))
+    // TODO: Why tailCall(move + 1) isn't working here?
+    if(el name isNil, self prev(move + 1), el))
     
   next := method(move,
     move ifNil(move = 1)
+    
     el := self parent subitems at(self positionInParent + move)
-    el ifNil(return nil)
-    if(el name isNil, next(move + 1), el))
+    el ifNil(return(nil))
+    if(el name isNil, self next(move + 1), el))
 
   insertBefore := method(el,
     pos := self positionInParent
@@ -114,7 +118,6 @@ SGMLElement do(
     self)
 
   insertAfter := method(el,
-    pos := 0
     self adopt(el) foreach(el,
       self parent subitems insertAt(el, self positionInParent + 1))
     self)
@@ -125,7 +128,8 @@ SGMLElement do(
     node)
 )
 
-SGML htmlFromFile := method(file,
+HTML := SGML
+HTML fromFile := method(file,
   (file type == "Sequence") ifTrue(file = File openForReading(file))
   text := file contents
   file close

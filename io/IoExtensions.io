@@ -32,7 +32,6 @@ Block proto asJson := "null"
 nil asJson  := "null"
 nil ifTrue  := method(nil)
 nil ifFalse := method(call evalArgAt(0))
-null := nil
 
 Message proto setArgAt := method(index, arg,
   self setArguments(self arguments clone atPut(index, arg)))

@@ -1,13 +1,16 @@
 DebugController := Controller clone do(
   beforeFilter("dontCache")
   
-  index := method(self slotNames)
+  index := lazySlot(self slotNames)
 
-  controllers := method(
+  controllers := lazySlot(
     Generys controllers map(c, "<pre>" .. c .. "</pre>") join)
 
-  routes := method(
-    Generys routes map(r, "<pre>" .. r .. "</pre>") join)
+  routes := lazySlot(
+    view("static/routes.html") do(
+      thead := self findFirst("table thead")
+      Generys routes foreach(r, thead append("<span>" .. r controller .. "</span>"))
+    ))
 
   formatters := method(
     Generys formatters map(f, "<pre>" .. f .. "</pre>") join)
@@ -22,4 +25,9 @@ DebugController := Controller clone do(
   
   futureResponses := method(
     Generys futureResponses keys map(k, "<pre>" .. k .. "</pre>") join)
+  
+  webSockets := method(
+    Generys webSockets map(k, v, "<pre>" .. v .. "</pre>") join)
+  
+  headers  := method("<pre>" .. (self request headers asObject) .. "</pre>")
 )

@@ -54,32 +54,37 @@ Controller := Object clone do (
     call message arguments map(asString) contains(request requestMethod) ifFalse(
       Exception raise("wrongRequestMethod")))
 
-  isPOST        := lazySlot(request requestMethod == "POST")
-  isGET         := lazySlot(request requestMethod == "GET")
-  isPUT         := lazySlot(request requestMethod == "PUT")
-  isDELETE      := lazySlot(request requestMethod == "DELETE")
-  isHEAD        := lazySlot(request requestMethod == "HEAD")
-  isAjaxRequest := lazySlot(request headers["x-requested-with"] asLowercase == "xmlhttprequest")
+  isPOST        := lazySlot(self request requestMethod == "POST")
+  isGET         := lazySlot(self request requestMethod == "GET")
+  isPUT         := lazySlot(self request requestMethod == "PUT")
+  isDELETE      := lazySlot(self request requestMethod == "DELETE")
+  isHEAD        := lazySlot(self request requestMethod == "HEAD")
+  isAjaxRequest := lazySlot(self request headers["X_REQUESTED_WITH"] asLowercase == "xmlhttprequest")
+  isWebSocket   := lazySlot(
+    self isGET\
+      and(self request headers["UPGRADE"] asLowercase == "websocket")\
+      and(self request headers["CONNECTION"] asLowercase == "upgrade"))
 
-  setStatusCode := method(code, response statusCode = code; self)
+  setStatusCode := method(code, self response statusCode = code; self)
 
   cacheFor := method(dur,
-    response setHeader("Cache-Control", "max-age=" .. dur .. ", must-revalidate"))
+    self response setHeader("Cache-Control", "max-age=" .. dur .. ", must-revalidate"))
 
   dontCache := method(
-    response setHeader("Expires", Date fromNumber(0) asHTTPDate)
-    response setHeader("Cache-Control", "no-cache, no-store"))
+    self response setHeader("Expires", Date fromNumber(0) asHTTPDate)
+    self response setHeader("Cache-Control", "no-cache, no-store"))
 
   forceDownload := method(filename,
-    response setHeader("Content-Disposition", "attachment; filename=" .. filename))
+    self response setHeader("Content-Disposition", "attachment; filename=" .. filename)
+    if(filename type == "File", file, self))
   
   redirectTo := method(url, anStatusCode,
     # 302 = Temporary redirect
     anStatusCode ifNil(anStatusCode = 302)
-    setStatusCode(anStatusCode)
+    self setStatusCode(anStatusCode)
     
     #url containsSeq("http") ifFalse(url = Generys serverURL .. Generys config urlPrefixPath .. url)
-    response setHeader("Location", url)
+    self response setHeader("Location", url)
     "")
 
   redirectToRoute := method(routeName, params,
@@ -88,23 +93,31 @@ Controller := Object clone do (
     route := Generys routes select(name == routeName) first
     route ifNil(Exception raise("Could not find route named '#{routeName}'" interpolate))
     
-    redirectTo(route interpolate(params)))
+    self redirectTo(route interpolate(params)))
   
   createFutureResponse := method(name,
-    futureId := session sessionId .. "-" .. name
-    FutureResponse at(futureId) isNil ifFalse(
-      return FutureResponse at(futureId))
-    
-    session setSlot(name .. "FutureId", futureId)
-    FutureResponse clone setName(futureId))
-  
-  getFutureResponse := method(name, FutureResponse at(session sessionId .. "-" .. name))
-  
-  session := lazySlot(
-    Generys getSession(self request, self response))
+    Generys futureResponses hasKey(name) ifTrue(
+      return(Generys futureResponses[name]))
+
+    FutureResponse clone setName(name))
+  getFutureResponse := method(name, Generys futureResponses[name])
+
+  createWebSocket := method(name, handler,
+    Generys webSockets hasKey(name) ifTrue(Generys webSockets[name] close)
+
+    webSocket := WebSocket with(name, self request, self response) setHandler(handler)
+    Generys webSockets atPut(name, webSocket)
+
+    webSocket)
+  getWebSocket := method(name, Generys webSockets[name])
+
+  session ::= method(
+    _session := Generys getSession(self request, self response)
+    _session isNil ifFalse(self session = _session)
+    _session)
 
   destroySession := method(
-    Generys sessions removeAt(session sessionId))
+    Generys sessions removeAt(self session sessionId))
 
-  view := method(path, self view = SGML htmlFromFile(path))
+  view := lazySlot(path, HTML fromFile(path))
 )
