@@ -13,7 +13,6 @@ Generys := HttpServer clone do (
 
   formatters  := list()
   sessions    := nil
-  _sessionLock:= false
   webSockets  := Map clone
   futureResponses := Map clone
   
@@ -61,10 +60,6 @@ Generys := HttpServer clone do (
     Dispatcher handleRequest(req, resp))
 
   getSession := method(req, resp,
-    while(self _sessionLock == true,
-      log debug("!!! *** Waiting for session lock *** !!!"))
-    self _sessionLock = true
-    
     cookieName := self config sessionCookieName
     sessionId := req cookies[cookieName]
     
@@ -76,7 +71,6 @@ Generys := HttpServer clone do (
       session setSlot("sessionId", sessionId)
       self sessions atPut(sessionId, session))
 
-    self _sessionLock = false
     self sessions[sessionId])
 )
 Generys clone := Generys
