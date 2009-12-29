@@ -67,8 +67,9 @@
         if("WebSocket" in window) {
           Chat.socket = new WebSocket("ws://127.0.0.1:4000/chat/updates");
           Chat.socket.onmessage = function (e) {
-            if(e.auth) {
-              Chat.myNick = e.user.nick;
+            if(e.authDetails) {
+              Chat.user = e.user;
+              Chat.myNick = Chat.user.nick;
             } else {
               Chat.showMessage(JSON.parse(e.data));
             }
