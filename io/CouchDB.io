@@ -17,14 +17,14 @@ CouchDB := Object clone do(
     (path[0] == "/"[0]) ifTrue(path = path exSlice(1))
     if(options isNil,
       options = "",
-      options = "?" .. options asQueryString)
+      options = "?" .. (options asQueryString))
     
     e := try(
-      response := URL with(self url .. path) fetch)
+      resp := URL with(self url .. path .. oprtions) fetch)
     e catch(
       CouchDbException clone setIsConnectError(true) raise)
 
-    CouchDoc from(Yajl parseJson(response)) setDb(self))
+    CouchDoc from(Yajl parseJson(resp)) setDb(self))
   squareBrackets := getSlot("at")
 
   atPut := method(id, doc,
@@ -50,8 +50,12 @@ CouchDB := Object clone do(
     
     parseStatusCode(req statusCode, resp) ifTrue(self))
   
-  select := method(viewName,
-    req := URL with(self url .. "_design/" .. (self .. dbName) .. "/" .. viewName)
+  select := method(viewName, options,
+    if(options isNil,
+      options = "",
+      options = "?" .. (options asQueryString))
+
+    req := URL with(self url .. "_design/" .. (self .. dbName) .. "/" .. viewName .. options)
     resp := req fetch
     
     parseStatusCode(req statusCode, resp) ifTrue(
