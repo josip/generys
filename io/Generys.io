@@ -48,6 +48,7 @@ Generys := HttpServer clone do (
 
     Directory with(self root .. "/app/models") doFiles
     Directory with(self root .. "/app/controllers") doFiles
+    Directory with(self root .. "/lib") doFiles
 
     self setHost(self config host)
     self setPort(self config port)
