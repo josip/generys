@@ -130,7 +130,7 @@ CouchDoc := Map clone do(
   create  := method(
     self radio emit("beforeCreate", self)
     self db atPut(self) ifTrue(
-      self radioEmit("afterCreate", self))
+      self radio emit("afterCreate", self))
     self)
 
   listenTo := method(channel, callback, self radio listenTo(channel, callback); self)
