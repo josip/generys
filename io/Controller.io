@@ -120,5 +120,5 @@ Controller := Object clone do (
   destroySession := method(
     Generys sessions removeAt(self session sessionId))
 
-  view := lazySlot(path, HTML fromFile(path))
+  view := method(HTML fromFile(path))
 )
