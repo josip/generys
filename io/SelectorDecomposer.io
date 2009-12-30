@@ -126,6 +126,10 @@ SGMLElement do(
     (node := self parent) returnIfNil
     while(node parent, node = node parent)
     node)
+  
+  setAttribute := method(name, value,
+    self attributes atPut(name, value)
+    self)
 )
 
 HTML := SGML
