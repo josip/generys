@@ -50,6 +50,16 @@ CouchDB := Object clone do(
     
     parseStatusCode(req statusCode, resp) ifTrue(self))
   
+  select := method(viewName,
+    req := URL with(self url .. "_design/" .. (self .. dbName) .. "/" .. viewName)
+    resp := req fetch
+    
+    parseStatusCode(req statusCode, resp) ifTrue(
+      resp = Yajl parseJson(resp)
+      ))
+  
+  getView := getSlot("select")
+
   parseStatusCode := method(code, body,
     code switch(
       400, CouchDBException clone setIsBadRequest(true),
@@ -71,7 +81,10 @@ CouchDBException := Exception clone do(
 
 CouchDoc := Map clone do(
   db ::= nil
-
+  
+  init := method(
+    self radio := Radio clone)
+  
   from := method(map, 
     if(map["ioType"] isNil or map["ioType"] == self type,
       self clone merge(map)
@@ -89,20 +102,32 @@ CouchDoc := Map clone do(
   
   id := method(self["_id"])
   rev := method(self["_rev"])
-  #forward := method(self at(call message name))
 
   delete := method(
     id ifNil(Exception raise("Document is missing '_id' property, could not delete it"))
     rev ifNil(Exception raise("Document is missing '_rev' propery, could not delete it"))
 
+    self radio emit("beforeDelete", self)
     req := URL with(self db url .. id .. "?rev=" .. rev)
     resp := req delete
     self db parseStatusCode(req statusCode) ifTrue(
-      self isDeleted := true))
+      self isDeleted := true
+      self radio emit("afterDelete")))
 
-  update  := method(self db atPut(id, self); self)
+  update  := method(
+    self radio emit("beforeUpdate", self)
+    self db atPut(id, self)
+    self radio emit("afterUpdate", self)
+    self)
   save    := getSlot("update")
-  create  := method(self db atPut(self); self)
+
+  create  := method(
+    self radio emit("beforeCreate", self)
+    self db atPut(self) ifTrue(
+      self radioEmit("afterCreate", self))
+    self)
+
+  listenTo := method(channel, callback, self radio listenTo(channel, callback); self)
 )
 
 CouchDocTemplate := Object clone do(
@@ -110,9 +135,11 @@ CouchDocTemplate := Object clone do(
   db          ::= nil
   docProto    ::= nil
   
-  setup := method(self clone doMessage(call message setName("do")) done)
+  setup := method(
+    self clone doMessage(call message setName("do")) done)
 
-  init := method(self setDocProto(CouchDoc clone))
+  init := method(
+    self setDocProto(CouchDoc clone))
 
   done := method(
     self db ifNil(self db = CouchDB default)
@@ -121,6 +148,11 @@ CouchDocTemplate := Object clone do(
     self)
 
   property := method(prop, self properties append(prop))
+  
+  timestamps := method(
+    self property("created_at")
+    self property("updated_at")
+    self)
   
   new := method(theProperties,
     doc := self docProto from(theProperties)
