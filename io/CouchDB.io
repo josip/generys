@@ -162,7 +162,7 @@ CouchDocTemplate := Object clone do(
     self docProto listenTo("before" .. (event makeFirstCharacterUppercase), callback)
     self)
 
-  after := doString(getSlot("before") code replaceSeq("before", "after"))
+  after := doString(getSlot("before") code asMutable replaceSeq("before", "after"))
 
   new := method(theProperties,
     doc := self docProto from(theProperties)
