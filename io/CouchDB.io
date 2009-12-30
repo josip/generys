@@ -20,11 +20,12 @@ CouchDB := Object clone do(
       options = "?" .. (options asQueryString))
     
     e := try(
-      resp := URL with(self url .. path .. oprtions) fetch)
+      resp := URL with(self url .. path .. options) fetch)
     e catch(
       CouchDBException clone setIsConnectError(true) raise)
 
     CouchDoc from(Yajl parseJson(resp)) setDb(self))
+  
   squareBrackets := getSlot("at")
 
   atPut := method(id, doc,
@@ -81,7 +82,8 @@ CouchDBException := Exception clone do(
   isResourceNotAllowed    ::= false
   isConflict              ::= false
   isPreconditionFailed    ::= false
-  isInternalServerError   ::= false)
+  isInternalServerError   ::= false
+  isConnectError          ::= false)
 
 CouchDoc := Map clone do(
   db ::= nil
