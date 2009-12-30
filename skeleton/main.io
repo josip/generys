@@ -5,8 +5,6 @@ list("framework/io", "lib/", "app/models", "app/controllers") foreach(path,
 
 Generys do(
   root      := Directory currentWorkingDirectory
-  staticDir := Generys root .. "/static"
-  tmpDir    := Generys root .. "/tmp"
 )
 
 if(System launchScript ?containsSeq("main.io"), Generys serve)

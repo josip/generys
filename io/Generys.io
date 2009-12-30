@@ -41,6 +41,9 @@ Generys := HttpServer clone do (
   #requestHandlerProto = Dispatcher
   serve := method(
     self loadConfig
+    self staticDir := Generys root .. "/static"
+    self tmpDir    := Generys root .. "/tmp"
+
     self sessions = Object getSlot(self config sessionStore) clone
 
     doFile(self root .. "/config/routes.io")
