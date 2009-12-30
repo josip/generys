@@ -22,7 +22,7 @@ CouchDB := Object clone do(
     e := try(
       resp := URL with(self url .. path .. oprtions) fetch)
     e catch(
-      CouchDbException clone setIsConnectError(true) raise)
+      CouchDBException clone setIsConnectError(true) raise)
 
     CouchDoc from(Yajl parseJson(resp)) setDb(self))
   squareBrackets := getSlot("at")
