@@ -34,6 +34,7 @@ Controller := Object clone do (
   beforeFilter := method(filter, options, 
     options ifNil(options = Map clone)
     self beforeFilters append(options merge({filter: filter})))
+
   afterFilter  := method(filter, options,
     options ifNil(options = Map clone)
     self afterFilters append(options merge({filter: filter})))

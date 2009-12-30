@@ -39,8 +39,8 @@ Dispatcher := Object clone do(
       slotName = route action interpolate(mappedValues asObject)
       #(slotName[0] == ":"[0]) ifTrue(slotName = mappedValues[slotName exSlice(1)])
       
-      obj ?privateSlots ?contains(slotName) ifTrue(
-        log debug("Route #{route} requires private slot '#{slotName}'")
+      (obj ?privateSlots ?contains(slotName) or(slotName[0] asCharacter == "_")) ifTrue(
+        log debug("Route #{route} tried to activate private slot '#{slotName}'")
         return Error with("noSlot"))
 
       obj = obj cloneWithoutInit\

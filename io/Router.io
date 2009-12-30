@@ -62,11 +62,12 @@ ResourceMatch := Object clone do(
       name = name .. "s"
     )
     
-    Router GET(controllerPath)   from({controller: name,   action: "index"})    as("list" .. name)
-    Router POST(controllerPath)  to({controller: name,     action: "create"})   as("create" .. nameSingular)
-    Router GET(resourcePath)     from({controller: name,   action: "show"})     as("show" .. nameSingular)
-    Router PUT(resourcePath)     to({controller: name,     action: "update"})   as("update" .. nameSingular)
-    Router DELETE(resourcePath)  from({controller: name,   action: "destroy"})  as("destroy" .. nameSingular)
+    Router GET(controllerPath)    from({controller: name,   action: "index"})    as("list" .. name)
+    Router GET(controllerPath)    from({controller: name,   action: "new"})      as("new" .. nameSingular)
+    Router POST(controllerPath)   to({controller: name,     action: "create"})   as("create" .. nameSingular)
+    Router GET(resourcePath)      from({controller: name,   action: "show"})     as("show" .. nameSingular)
+    Router PUT(resourcePath)      to({controller: name,     action: "update"})   as("update" .. nameSingular)
+    Router DELETE(resourcePath)   from({controller: name,   action: "destroy"})  as("destroy" .. nameSingular)
     
     Router connect(controllerPath .. "/:action") to({controller: name, action: "#{action}"})
     Router connect(resourcePath .. "/:action") to({controller: name, action: "#{action}"})

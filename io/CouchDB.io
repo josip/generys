@@ -153,7 +153,13 @@ CouchDocTemplate := Object clone do(
     self property("created_at")
     self property("updated_at")
     self)
-  
+
+  before := method(event, callback,
+    self docProto listenTo("before" .. (event makeFirstCharacterUppercase), callback)
+    self)
+
+  after := doString(getSlot("before") code replace("before", "after"))
+
   new := method(theProperties,
     doc := self docProto from(theProperties)
     doc atPut("ioType", self type)
