@@ -1,6 +1,6 @@
 Radio := Object clone do(
   init := method(
-    self listners := Map clone)
+    self listeners := Map clone)
 
   listenTo := method(channel, callback,
     self listeners hasKey(channel) ifFalse(
@@ -12,5 +12,5 @@ Radio := Object clone do(
     self listeners at(channel) removeValue(callback))
 
   emit := method(onChannel, arg,
-    self listeners [onChannel] map(call(arg)))
+    self listeners[onChannel] ?map(call(arg)))
 )
