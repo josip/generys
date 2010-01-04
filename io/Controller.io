@@ -106,10 +106,7 @@ Controller := Object clone do (
   createWebSocket := method(name, handler,
     Generys webSockets hasKey(name) ifTrue(Generys webSockets[name] close)
 
-    webSocket := WebSocket with(name, self request, self response) setHandler(handler)
-    Generys webSockets atPut(name, webSocket)
-
-    webSocket)
+    WebSocket with(name, self request, self response) setHandler(handler))
   getWebSocket := method(name, Generys webSockets[name])
 
   session ::= method(
@@ -120,5 +117,5 @@ Controller := Object clone do (
   destroySession := method(
     Generys sessions removeAt(self session sessionId))
 
-  view := method(HTML fromFile(path))
+  view := SGML getSlot("fromFile")
 )

@@ -109,7 +109,7 @@ WebSocket := Object clone do(
       return(self)
     )
     e catch(
-      log debug("WebSocket to #{self socket host} has been closed while pushing new data.")
+      log debug("WebSocket to #{self socket host} has been closed while sending data.")
       self close))
   
   listen := method(

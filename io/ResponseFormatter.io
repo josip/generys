@@ -73,8 +73,9 @@ ResponseFormatter clone do(
 
 ResponseFormatter clone do(
   respondsToType = "WebSocket"
-  format := method(ws, resp,
-    ws handshaked ifFalse(ws handshake)
+  format := method(webSocket, resp,
+    Generys webSockets atPut(webSocket name, webSocket)
+    webSocket handshaked ifFalse(webSocket handshake)
     "")
 )
 

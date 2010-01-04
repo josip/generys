@@ -34,14 +34,14 @@ Dispatcher := Object clone do(
 
       obj ifNil(
         log error("Route #{route} requires non-existing controller '#{controllerName}'")
-        return Error with("noController"))
+        return(Error with("noController")))
 
       slotName = route action interpolate(mappedValues asObject)
       #(slotName[0] == ":"[0]) ifTrue(slotName = mappedValues[slotName exSlice(1)])
       
       (obj ?privateSlots ?contains(slotName) or(slotName[0] asCharacter == "_")) ifTrue(
         log debug("Route #{route} tried to activate private slot '#{slotName}'")
-        return Error with("noSlot"))
+        return(Error with("noSlot")))
 
       obj = obj cloneWithoutInit\
         setResponse(resp)\
@@ -51,8 +51,9 @@ Dispatcher := Object clone do(
     )
     
     #(slotName isNil or object hasSlot(slotName) not) ifTrue(return Error with("noSlot"))
-    slotName ifNil(return Error with("noSlot"))
-    obj hasSlot(slotName) ifFalse(return Error with("noSlot"))
+    (slotName == nil or(obj hasSlot(slotName) not)) ifTrue(
+      log debug("Route #{route} specified missing slot '#{slotName}'")
+      return(Error with("noSlot")))
 
     slotResp := nil
     e := try(
