@@ -21,18 +21,17 @@ Radio GaGa: Now playing 'Is it any Wonder?' by Keane.
   <code>callback</code> block will be called after <code>Radio emit()</code> is called.*/ 
   listenTo := method(channel, callback,
     self listeners hasKey(channel) ifFalse(
-      self listeners atPut(channel, list()))
+      self listeners atPut(channel, []))
     self listeners[channel] append(callback)
     self)
 
   //doc Radio listen(channel, callback) Removes callback from channel.
   removeListener := method(channel, callback,
-    channel = self listeners[channel]
-    self listeners at(channel) remove(callback)
+    self listeners[channel] remove(callback)
     self)
   
   //doc Radio emit(onChannel[, args]) Calls all channel's subscribers with provided arguments.
   emit := method(onChannel, args,
     args isKindOf(List) ifFalse(args = [args])
-    self listeners[onChannel] ?map(performWithArgList("call", args))
+    self listeners[onChannel] ?map(performWithArgList("call", args)))
 )

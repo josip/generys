@@ -1,7 +1,8 @@
 ResponseFormatter := Object clone do(
 /*metadoc ResponseFormatter description
 ResponseFormatters are responsible for final shaping of the data returned by controller.
-Depending on the type of data returned the right ResponseFormatter will be activated and the data returned by it will be sent to the browser.
+Depending on the type of the data returned by controller (ExceptionController included),
+the right ResponseFormatter will be activated and the data returned by it will be sent to the browser.
 */
   //doc ResponseFormatter respondsToType Type on which ResponseFormatter should be activated.
   respondsToType ::= nil
