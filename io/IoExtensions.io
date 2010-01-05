@@ -1,22 +1,47 @@
 IoExtensions := Object clone
 
 Object do(
+  //doc Object squareBrackets(...) Alias for list(). <code><pre>[1, 2, 3, 4]</pre></code>
   squareBrackets := getSlot("list")
   
-  # NOTE: The order is not preserved
+  /*doc Object curlyBrackets(...)
+  JavaScript syntax for Map.<br/>
+  Note that order will not be preserved, as well as that quotes are not allowed around propery names (as in JSON specification).
+  <code><pre>
+  prices:= {
+    vanilla:    12.20,
+    chocolate:  12.25,
+    strawberry: 13.30
+  }</pre></code>*/
   curlyBrackets := method(
     map := Map clone
     call message arguments foreach(arg,
       map atPut(arg name, arg next next doInContext(call sender)))
     map)
 
+  //doc Object asMap() Converts Object to Map
   asMap := method(
     slots := self slotNames map(slotName, self getSlot(slotName))
     Map clone addKeysAndValues(self slotNames, slots))
 
+  //doc Object asJson() Converts Object to JSON Sequence.
   asJson := method(self asMap asJson)
 )
 
+/*doc List squareBrackets
+Allows access to List, Map and Sequence elements with syntax common to other languages.
+<code><pre>
+Io> colours := ["Brown", "Blue", "Violet sky"]
+==> list("Brown", "Blue", "Violet sky")
+Io> colours[0]
+==> "Brown"
+Io> colours[1,2]
+=> list("Blue", "Violet sky")
+Io> prices["chocolate"]
+==> 12.25
+Io> prices["chocolate", "strawberry"] reduce(+)
+==> 25.75
+</pre></code>*/
 List squareBrackets := Map squareBrackets := Sequence squareBrackets := method(
   evaled := call message argsEvaluatedIn(call sender)
   if(evaled size == 1,
@@ -28,31 +53,41 @@ List squareBrackets := Map squareBrackets := Sequence squareBrackets := method(
   ))
 
 # You probably don't want to show your code to the world?
+//doc Block asJson Returns "null".
 Block proto asJson := "null"
+//doc nil asJson Returns "null".
 nil asJson  := "null"
+//doc nil ifTrue() Returns <code><nil/code>.
 nil ifTrue  := method(nil)
+//doc nil ifFalse(code)  Calls and returns result of <code>code</code>.
 nil ifFalse := method(call evalArgAt(0))
 
-Message proto setArgAt := method(index, arg,
+//doc Message setArgAt(index, value) Clones message arguments and replaces value of argument at <code>index</code>.
+Message setArgAt := method(index, arg,
   self setArguments(self arguments clone atPut(index, arg)))
 
-Date proto do(
+Date do(
+  //doc Date asHTTPDate() Returns Date as Sequence in HTTP format.
   asHTTPDate := method(
     self asString("%a, %d %b %Y %H:%M:%S %Z"))
 
+  //doc Date asJson() Alias of <code>Date asString</code>.
   asJson := method(self asString asJson)
 )
 
-Directory proto do(
+Directory do(
+  //doc Directory doFiles() Executes all .io files in given directory. 
   doFiles := method(
     p := self path
     self fileNames foreach(fileName,
       fileName containsSeq(".io") ifTrue(doFile(p .. "/" .. fileName))))
 
-  mimeType := method("application/x-not-regular-file")
+  //doc Directory mimeType Returns "application/x-not-regular-file".
+  mimeType := "application/x-not-regular-file"
 )
 
 # List of most common mime-types, stolen from Rack.
+//doc File mimeTypes Map of known MIME type with file extension as key.
 File mimeTypes := {
   #3gp:      "video/3gpp",
   a:        "application/octet-stream",
@@ -221,7 +256,9 @@ File mimeTypes := {
   zip:      "application/zip"
 }
 
-File proto do(
+File do(
+  //doc File ext() Returns file's extension. (Letters after last ".")
   ext := method(self name split(".") last)
+  //doc File mimeType() Returns file's MIME type.
   mimeType := method(File mimeTypes[self ext])
 )

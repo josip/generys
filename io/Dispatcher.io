@@ -1,6 +1,14 @@
 HttpServer
 
 Dispatcher := Object clone do(
+//metadoc Dispatcher category Networking
+/*metadoc Dispatcher description
+An HTTP request dispatcher, it is responsible
+for selecting right route depending on the requested
+path and finalize rendering - activate right ResponseFormatter.
+*/
+
+  //doc Dispatcher handleRequest(request, response) Prepares path, calls dispatch() and formats response.
   handleRequest := method(req, resp,
     log info("Processing request #{req path}")
 
@@ -9,7 +17,8 @@ Dispatcher := Object clone do(
       req path)
 
     resp body = self formatResponse(self dispatch(req, resp), req, resp))
-
+  
+  //doc Dispatcher dispatch(request, response, candidateAt) Selects right route and activates it.
   dispatch := method(req, resp, candidateAt,
     candidates := Generys routes select(respondsTo(req path, req requestMethod))
     candidates isEmpty ifTrue(return Error with("noRoute"))
@@ -33,14 +42,14 @@ Dispatcher := Object clone do(
       obj = Generys controllers[controllerName]
 
       obj ifNil(
-        log error("Route #{route} requires non-existing controller '#{controllerName}'")
+        log error("Route #{route pattern} requires non-existing controller '#{controllerName}'")
         return(Error with("noController")))
 
       slotName = route action interpolate(mappedValues asObject)
       #(slotName[0] == ":"[0]) ifTrue(slotName = mappedValues[slotName exSlice(1)])
       
       (obj ?privateSlots ?contains(slotName) or(slotName[0] asCharacter == "_")) ifTrue(
-        log debug("Route #{route} tried to activate private slot '#{slotName}'")
+        log debug("Route #{route pattern} tried to activate private slot '#{slotName}'")
         return(Error with("noSlot")))
 
       obj = obj cloneWithoutInit\
@@ -52,23 +61,26 @@ Dispatcher := Object clone do(
     
     #(slotName isNil or object hasSlot(slotName) not) ifTrue(return Error with("noSlot"))
     (slotName == nil or(obj hasSlot(slotName) not)) ifTrue(
-      log debug("Route #{route} specified missing slot '#{slotName}'")
+      log debug("Route #{route pattern} specified missing slot '#{slotName}'")
       return(Error with("noSlot")))
 
     slotResp := nil
     e := try(
       slotIsBlock := obj getSlot(slotName) type == "Block"
-      if(slotIsBlock,
-        args := obj getSlot(slotName) argumentNames map(arg, mappedValues[arg]),
-        args := mappedValues)
+      args := if(slotIsBlock,
+        obj getSlot(slotName) argumentNames map(arg, mappedValues[arg]),
+        mappedValues)
       
       obj ?doBeforeFilters(args)
-      if(slotIsBlock,
-        slotResp = obj ?performWithArgList(slotName, args),
-        slotResp = obj getSlot(slotName) /*?interpolate(args asObject)*/)
+      slotResp = if(slotIsBlock,
+        obj ?performWithArgList(slotName, args),
+        obj getSlot(slotName))
       obj ?doAfterFilters([slotResp])
       obj ?session ?save)
 
+    # We can't return from catch block, therefor
+    # we have to use this little dirty trick
+    # (other exceptions are handled by ResponseFormatter)
     _skipRoute := false
     e catch(_skipRoute = e ?error == "skipRoute")
     _skipRoute ifTrue(
@@ -77,6 +89,7 @@ Dispatcher := Object clone do(
 
     if(e, e, slotResp))
 
+  //doc Dispatcher formatResponse(controllerResponse, request, response) Activates ResponseFormatter for controllerResponse.
   formatResponse := method(ctrlResp, req, resp,
     rtype := ctrlResp type
     rformatters := Generys formatters reverse

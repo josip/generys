@@ -1,10 +1,24 @@
 ResponseFormatter := Object clone do(
+/*metadoc ResponseFormatter description
+ResponseFormatters are responsible for final shaping of the data returned by controller.
+Depending on the type of data returned the right ResponseFormatter will be activated and the data returned by it will be sent to the browser.
+*/
+  //doc ResponseFormatter respondsToType Type on which ResponseFormatter should be activated.
   respondsToType ::= nil
+  //doc ResponseFormatter respondsToTypes List of types to which ResponseFormatter should be activated.
   respondsToTypes ::= list()
   
   init := method(Generys formatters appendIfAbsent(self))
+  
+  /*doc ResponseFormatter test(controllerResponse)
+  Method which will be called when no ResponseFormatter responds to given type.
+  Method should return eiter <code>true</code> if it can handle given data, <code>false</code> otherwise. */
   test := method(resp, false)
-  format := method(resp, resp asString)
+  
+  /*doc ResponseFormatter format(controllerResponse, httpResponse, httpRequest)
+  Method which will be called on selected ResponseFormatter.
+  Method should return Sequence which will be sent to the browser, as well as setting up appropriate <em>Content-Type</em> header etc.*/
+  format := method(ctrlResp, resp, req, ctrlResp asString)
 )
 
 # Note that first defined formatter will be tested last
