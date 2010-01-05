@@ -34,7 +34,14 @@ ResponseFormatter clone do(
     log debug("#{error}")
     log debug("#{error coroutine}")
 
-    excpCtrl := Generys ExceptionsController clone setRequest(req) setResponse(resp)
+    # Tests first if specialised Exceptions controller exists, if not, use the default one.
+    # We call cloneWithoutInit() on ExceptionsController becouse init method contains code
+    # which appends the controller to Generys controllers, something we don't need.
+    excpCtrl := Generys controllers at(req route ?controller .. "Exceptions") ?clone ifNil(
+                ExceptionsController cloneWithoutInit)
+
+    excpCtrl setRequest(req) setResponse(resp)
+
     if(excpCtrl hasSlot(name),
       log error("Activating handler for '#{name}' exception")
       excpCtrl perform(name, error)

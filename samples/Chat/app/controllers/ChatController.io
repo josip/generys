@@ -2,7 +2,6 @@ ChatController := Controller clone do(
   beforeFilter("dontCache")
   beforeFilter("requireAuth", {except: ["index", "login", "register", "updates"]})
  
-
   index := method(
     if(isLoggedIn, File with("static/chat/room.html"), redirectToRoute("login")))
   

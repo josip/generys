@@ -106,10 +106,11 @@ RouteMatch is the object with which you operate in routes.io. It provides method
 ResourceMatch := Object clone do(
 //metadoc ResourceMatch category Networking
 /*metadoc ResourceMatch description
+<p>
 ResourceMatch is object which is returned by <code>Router resource()</code> and you'll be mostly woking with it in <code>router.io</code>.
 It provides convience methods for creating Routes which will automatically bind your controller's methods on a RESTful way.
-<br/><br/>
-Routeing table for <code>Router resource("IceCream")</code><br/>
+</p>
+<p>Routeing table for <code>Router resource("IceCream")</code>:</p>
 <table>
   <thead>
     <tr>
@@ -121,52 +122,52 @@ Routeing table for <code>Router resource("IceCream")</code><br/>
   </thead>
   <tbody>
     <tr>
-      <td>/<em>icecream</em>s</td>
+      <td>/<u>icecream</u>s</td>
       <td>GET</td>
       <td>index</td>
-      <td>list<em>IceCream</em>s</td>
+      <td>list<u>IceCream</u>s</td>
     </tr>
     <tr>
-      <td>/<em>icecream</em>s/new</td>
+      <td>/<u>icecream</u>s/new</td>
       <td>GET</td>
       <td>new</td>
-      <td>new<em>IceCream</em></td>
+      <td>new<u>IceCream</u></td>
     </tr>
     <tr>
-      <td>/<em>icecream</em>s</td>
+      <td>/<u>icecream</u>s</td>
       <td>POST</td>
       <td>create</td>
-      <td>create<em>IceCream</em></td>
+      <td>create<u>IceCream</u></td>
     </tr>
     <tr>
-      <td>/<em>icecream</em>s/:id</td>
+      <td>/<u>icecream</u>s/:id</td>
       <td>GET</td>
       <td>show</td>
-      <td>show<em>IceCream</em></td>
+      <td>show<u>IceCream</u></td>
     </tr>
     <tr>
-      <td>/<em>icecream</em>s/:id</td>
+      <td>/<u>icecream</u>s/:id</td>
       <td>PUT</td>
       <td>update</td>
-      <td>update<em>IceCream</em></td>
+      <td>update<u>IceCream</u></td>
     </tr>
     <tr>
-      <td>/<em>icecream</em>s/:id</td>
+      <td>/<u>icecream</u>s/:id</td>
       <td>DELETE</td>
       <td>destroy</td>
-      <td>destroy<em>IceCream</em></td>
+      <td>destroy<u>IceCream</u></td>
     </tr>
   </tbody>
 </table>
-<br/><br/>
+<p>
 Example:<br/>
 router.io:
 <pre><code>
   Router do(
     resource("Car") hasMany("Owners")
   )</code></pre>
-<br/>
-CarsController.io:
+</p>
+<p>CarsController.io:
 <pre><code>
 CarsController := Controller clone do(
   index := method(Cars all)
@@ -196,7 +197,7 @@ CarsController := Controller clone do(
     Car removeAt(id)
     self redirectToRoute("listCar"))
 )
-</code></pre>*/
+</code></pre></p>*/
 
   name           ::= nil
   controllerPath ::= nil

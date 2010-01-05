@@ -15,7 +15,7 @@ Generys := HttpServer clone do (
     name = name .. "Controller"
     self select(type == name) first)
 
-  //doc Generys formatters List of all available <em>ReponseFormatter<em/>s.
+  //doc Generys formatters List of all available <em>ReponseFormatter</em>s.
   formatters  := list()
   //doc Generys sessions Hold session object
   sessions    := nil
@@ -40,12 +40,6 @@ Generys := HttpServer clone do (
   //doc Generys serverURL Returns complete URL, including protocol, port and prefix.
   serverURL := lazySlot("http://#{host}:#{port}#{urlPrefixPath}" interpolate(self config))
   envDir    := lazySlot(self root .. "/config/env/" .. (self config env))
-
-  /*doc Generys ExceptionsController
-  Controller which is used for exception handling, when you're defining your own methods you're actually adding them to this instance.*/
-  ExceptionsController := Controller cloneWithoutInit do(
-    private = true
-    init    = nil)
 
   //doc Generys loadConfig() Loads configuration file for current environment.
   loadConfig := method(

@@ -3,13 +3,25 @@
 WebSocketHandler := Object clone do(
 //metadoc WebSocketHandler category Networking
 /*metadoc WebSocketHandler description
-<p>Object which is called from WebSocket when connect is established, authenticated, disconnect or when an message is received.</p>
+<p>Object whose methods are called from WebSocket when connection is established, authenticated, disconnected or when an message is received.</p>
+<p>Example:
+<pre><code>
+ChatWebSocketHandler := WebSocketHandler clone do(
+  authenticate := method(sessionId,
+    super(authenticate(sessionId)) ifTrue(
+      self chatController := ChatController clone setSession(self session)
+      self socket send({authDetails: true, user: self session user} asJson)))
+
+  processMessage := method(msg,
+    self chatController post(msg["body"]))
+)
+</code></pre></p>
 */
   //doc WebSocketHandler socket Holds WebSocket object.
   socket          ::= nil
   //doc WebSocketHandler session Session object.
   session         ::= nil  
-  //doc WebSocketHandler isAuthenticated Shows if client already sent authentication cookie
+  //doc WebSocketHandler isAuthenticated Shows if the client has already sent authentication cookie.
   isAuthenticated ::= false
 
   //doc WebSocketHandler handleSocketConnect Method which is called once WebSocket connection is established.
@@ -22,14 +34,7 @@ WebSocketHandler := Object clone do(
 
   /*doc WebSocketHandler authenticate(sessionId)
     <p>Method called when authentication cookie arrives. Returns <code>true</code> if authentication succeeds.</p>
-    <p>If you plan on overwriting this slot remember to call <code>super(authenticate(sessionId))</code>
-    <pre><code>
-    ChatWebSocketHandler := WebSocketHandler clone do(
-      authenticate = method(sessionId,
-        super(authenticate(sessionId)) ifTrue(
-          self socket send({authenticated: true, userDetails: self session user})))
-    )
-    </code></pre></p>*/
+    <p>If you plan on overwriting this slot remember to call <code>super(authenticate(sessionId))</code></p>*/
   authenticate := method(sessionId, 
     Generys sessions hasKey(sessionId) ifFalse(return(false))
     
@@ -37,9 +42,12 @@ WebSocketHandler := Object clone do(
     self isAuthenticated = true)
 
   /*doc WebSocketHandler processData(data)
-  Method which is directly called from WebSocket when data arrives. This method then, if user is authenticated calls <code>WebSocketHandler proccessMessage()</code> or <code>WebSocketHandler authenticate()</code> otherwise.
-  <br/>
-  It is recommended that if you'll have to overwrite this slot that you do it after authentication happens (unless the authentication proccess is what you're changing).*/
+  <p>Method which is directly called from WebSocket when data arrives.
+  This method then, if user is authenticated calls <code>WebSocketHandler proccessMessage()</code>
+  or <code>WebSocketHandler authenticate()</code> otherwise.
+  </p>
+  <p>It is recommended that if you'll have to overwrite this slot,
+  that you do it after authentication happens (unless the authentication proccess is what you're changing).</p>*/
   processData := method(data,
     self isAuthenticated ifFalse(
       data = Yajl parseJson(data)
@@ -168,9 +176,6 @@ WebSocket := Object clone do(
       self socket readBuffer = self socket readBuffer exSlice(0, 0)
       chunks := buffer split(self _messageChunkSeparator)
 
-      #if(chunks size > 0,
-      #  log debug("Got #{chunks size} chunks via WebSocket from #{self socket host}"))
-      
       chunks foreach(chunk,
         #log debug("Parsing chunk #{n}, size: #{chunk at(2)}, data: #{chunk}")
         (chunk at(0) == 0) ifFalse(

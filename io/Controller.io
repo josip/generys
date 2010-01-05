@@ -218,3 +218,38 @@ ZooController := Controller clone do(
   view := method(path,
     HTML fromFile(Generys root .. path))
 )
+
+ExceptionsController := Controller cloneWithoutInit do(
+/*metadoc ExceptionsController description
+Default controller which is used for exception handling, clone this controller for custom exception controllers. */
+  //doc ExceptionsController private This controller is considered <em>private</em>, Dispatcher will never activate it.
+  private = true
+
+  //doc ExceptionsController noExceptionHandler(error) This slot will be called if required slot is not defined.
+  noExceptionHandler := method(e,
+    self setStatusCode(500)
+
+    if(Generys config env == "dev",
+      "An unknown error occured:<br/><pre>#{e}</pre>" interpolate,
+      "An unknown error occured."
+    ))
+
+  //doc ExceptionsController notFound(error) Handler for 404 errors.
+  notFound := method(e,
+    self setStatusCode(404)
+    "<h1>Not found (e#404)</h1>")
+  
+  //doc ExceptionsController noSlot(error) Alias for <code>ExceptionsContoller notFound</code>.
+  noSlot := getSlot("notFound")
+  
+  //doc ExceptionsController noRoute(error) Alias for <code>ExceptionsContoller noRoute</code>.
+  noRoute := getSlot("notFound")
+
+  //doc ExceptionsController internalError(error) Handler for 500 errors.
+  internalError := method(e,
+    self setStatusCode(500)
+    "<h1>Internal server error (e#500)</h1>")
+  
+  //doc ExceptionsController wrongRequestMethod(error) Alias for <code>ExceptionsContoller internalError</code>.  
+  wrongRequestMethod := getSlot("internalError")
+)

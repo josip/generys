@@ -3,11 +3,10 @@ HttpServer
 Dispatcher := Object clone do(
 //metadoc Dispatcher category Networking
 /*metadoc Dispatcher description
-An HTTP request dispatcher, it is responsible
-for selecting right route depending on the requested
-path and finalize rendering - activate right ResponseFormatter.
+An HTTP request dispatcher, it is responsible for selecting right route depending on the requested path and finalize rendering - activating the right ResponseFormatter.
 */
 
+  _routeCache := Map clone
   //doc Dispatcher handleRequest(request, response) Prepares path, calls dispatch() and formats response.
   handleRequest := method(req, resp,
     log info("Processing request #{req path}")
@@ -20,12 +19,19 @@ path and finalize rendering - activate right ResponseFormatter.
   
   //doc Dispatcher dispatch(request, response, candidateAt) Selects right route and activates it.
   dispatch := method(req, resp, candidateAt,
-    candidates := Generys routes select(respondsTo(req path, req requestMethod))
-    candidates isEmpty ifTrue(return Error with("noRoute"))
+    if(self _routeCache hasKey(req path),
+      route := self _routeCache[req path]
+    ,
+      candidates := Generys routes select(respondsTo(req path, req requestMethod))
+        candidates isEmpty ifTrue(return Error with("noRoute"))
+
+      candidateAt ifNil(candidateAt = 0)
+      route := candidates at(candidateAt)
+      route ifNil(return Error with("noRoute"))
+      self _routeCache atPut(req path, route)
+    )
     
-    candidateAt ifNil(candidateAt = 0)
-    route := candidates at(candidateAt)
-    route ifNil(return Error with("noRoute"))
+    req activatedRoute := route
     
     obj := nil
     slotName := nil
