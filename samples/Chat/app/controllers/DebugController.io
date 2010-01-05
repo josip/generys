@@ -9,10 +9,10 @@ DebugController := Controller clone do(
   routes := lazySlot(
     view("static/routes.html") do(
       thead := self findFirst("table thead")
-      Generys routes foreach(r, thead append("<span>" .. r controller .. "</span>"))
+      Generys routes foreach(r, thead append("<span>" .. (r controller) .. "</span>"))
     ))
 
-  formatters := method(
+  formatters := lazySlot(
     Generys formatters map(f, "<pre>" .. f .. "</pre>") join)
 
   time := method(

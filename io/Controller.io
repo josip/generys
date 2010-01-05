@@ -216,7 +216,7 @@ ZooController := Controller clone do(
 
   //doc Controller view(path) Alias for <code>HTML fromFile()</code>. Value of <code>Generys root</code> is prepended to <code>path</code>.
   view := method(path,
-    HTML fromFile(Generys root .. path))
+    HTML fromFile((Generys root) .. "/" .. path))
 )
 
 ExceptionsController := Controller cloneWithoutInit do(
