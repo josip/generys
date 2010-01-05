@@ -278,7 +278,7 @@ but the end-user should never directly use it
   httpMethods     ::= ["GET", "POST", "PUT", "DELETE"]
 
   //doc Route with(pattern) Creates a new route and appends it to <code>Generys routes</code> list. 
-  with := method(p, self clone setPattern(pattern))
+  with := method(p, self clone setPattern(p))
   init := method(Generys routes append(self); self)
 
   /*doc Route patternMatches
