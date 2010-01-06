@@ -3,7 +3,7 @@
   <head>
     <title>Chat!</title>
     <link rel="stylesheet" href="/chat/style.css" type="text/css" media="screen" charset="utf-8"/>
-    <script src="/jquery-1.3.2.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript" charset="utf-8">
       var Chat = {
         submit: function () {
@@ -66,19 +66,20 @@
         
         if("WebSocket" in window) {
           Chat.socket = new WebSocket("ws://127.0.0.1:4000/chat/updates");
-          Chat.socket.onmessage = function (e) {
-            if(e.authDetails) {
-              Chat.user = e.user;
-              Chat.myNick = Chat.user.nick;
-            } else {
-              Chat.showMessage(JSON.parse(e.data));
-            }
-          };
-          setTimeout(function () {
+          Chat.socket.onopen = function () {
             Chat.socket.send(JSON.stringify({
               sessionId: document.cookie.match(/_s\=(.+);?/)[1]
             }));
-          }, 360);
+          };
+          Chat.socket.onmessage = function (e) {
+            var message = JSON.parse(e.data);
+            if(message.authDetails) {
+              Chat.user = message.user;
+              Chat.myNick = Chat.user.nick;
+            } else {
+              Chat.showMessage(message);
+            }
+          };
         } else {
           setTimeout(Chat.poll, 360);
         }

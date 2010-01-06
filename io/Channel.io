@@ -7,27 +7,35 @@ Channel provides seamless integration of FutureResponse and WebSocket implementa
   cache       := list()
   cacheSize   := 20
 
-  //doc Channel subscribe(subscriber) Adds subscriber to channel. Subscriber is eiter FutureResponse, either WebSocket object
+  //doc Channel subscribe(subscriber) Adds subscriber to the channel. Subscriber can be FutureResponse or WebSocket object. Returns <code>subscriber</code>.
   subscribe := method(subscriber,
+    subscriber setChannel(self)
     self subscribers append(subscriber)
     subscriber)
+    
+  //doc Channel unsubscribe(subscriber) Removes subscriber from self. Returns <code>self</code>.
+  unsubscribe := method(subscriber,
+    subscriber setChannel(nil)
+    self subscribers remove(subscriber)
+    self)
 
   /*doc Channel send(message, excludeList)
-  Send message to all subscribers.
-  <code>excludeList</code> can contain list of subscribers (their <code>name</code> properties) to which message won't be sent.*/
-  send := method(msg, exclude,
-    exclude ifNil(exclude = [])
-    sent := 0
+  <p>Send message to all subscribers. Returns <code>message</code>.</p>
+  <p><code>excludeList</code> can contain list of subscribers (their <code>name</code> properties) to which message won't be sent.</p>*/
+  send := method(msg, excludeList,
+    excludeList ifNil(excludeList = [])
     
     self subscribers foreach(subscriber,
-      exclude contains(subscriber name) ifFalse(
-        sent = sent + 1
+      excludeList contains(subscriber name) ifFalse(
         subscriber send(msg) ?finish))
 
-    log debug("Sent message to #{sent} subscribers (#{exclude size} subscribers excluded)")
+    sentTo := self subscribers select(subscriber,
+      excludeList contains(subscriber name) not ifTrue(subscriber send(msg) ?finish)) size
+
+    log debug("Sent message to #{sentTo} subscribers (#{exclude size} subscribers excluded)")
 
     cache append(msg)
-    if(cache size == cacheSize, cache removeFirst)
+    if(cache size >= cacheSize, cache removeFirst)
 
     msg)
 

@@ -1,5 +1,5 @@
 ChatMessage := CouchDocTemplate setup(
   property("body")
-  property("userId")
-  property("createdAt")
+  property("user_id")
+  property("created_at")
 )

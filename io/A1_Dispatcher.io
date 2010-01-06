@@ -17,7 +17,7 @@ An HTTP request dispatcher, it is responsible for selecting right route dependin
 
     resp body = self formatResponse(self dispatch(req, resp), req, resp))
   
-  //doc Dispatcher dispatch(request, response, candidateAt) Selects right route and activates it.
+  //doc Dispatcher dispatch(request, response[, candidateAt]) Selects right route and activates it.
   dispatch := method(req, resp, candidateAt,
     if(self _routeCache hasKey(req path),
       route := self _routeCache[req path]
@@ -90,8 +90,8 @@ An HTTP request dispatcher, it is responsible for selecting right route dependin
     _skipRoute := false
     e catch(_skipRoute = e ?error == "skipRoute")
     _skipRoute ifTrue(
-      log info("Skipping route #{route}")
-      return(self dispatch(req, resp, candidateAt + 1)))
+      log info("Skipping route #{route pattern} for request #{req path}")
+      return(tailCall(req, resp, candidateAt + 1)))
 
     if(e, e, slotResp))
 

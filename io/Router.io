@@ -188,7 +188,7 @@ CarsController := Controller clone do(
   
   update := method(id, data,
     car := Car[id]
-    car union(data)
+    car merege(data)
     car save
 
     self show(id))

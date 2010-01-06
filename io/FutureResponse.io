@@ -6,6 +6,7 @@ FutureResponse := Object clone do(
   body        ::= nil
   queue       ::= nil
   limit       ::= 1
+  channel     ::= nil
 
   init := method(
     self queue = []
@@ -24,6 +25,7 @@ FutureResponse := Object clone do(
   close := method(
     log debug("Closed FutureResponse '#{self name}'")
     self closeSocket
+    self channel ?unsubscribe(self)
     Generys futureResponses removeAt(self name))
   
   //doc FutureResponse closeSocket() Closes only socket.

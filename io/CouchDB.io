@@ -77,7 +77,7 @@ Io> db["vanilla"]
   
   /*doc CouchDB select(viewName[, options])
   Access results of a view.<br/>
-  <code>options</code> Map can contain HTTP query params CouchDB provides.*/
+  <code>options</code> Map can contain HTTP query params which CouchDB supports.*/
   select := method(viewName, options,
     if(options isNil,
       options = "",
@@ -89,7 +89,8 @@ Io> db["vanilla"]
     resp := req fetch
     
     self parseStatusCode(req statusCode, resp) ifTrue(
-      resp = Yajl parseJson(resp)))
+      # We have to excplicitly return() 'cos Io would return true otherwise.
+      return(CouchDBView with(Yajl parseJson(resp), self))))
   
   //doc CouchDB getView(viewName[, options]) Alias of <code>CouchDB select()</code>
   getView := getSlot("select")
@@ -197,18 +198,18 @@ CouchDoc := Map clone do(
     self)
 )
 
-# We can't clone Map becouse rows can have same "key" property.
-CouchDBViewResponse := Object clone do(
-  //doc CouchDBViewResponse db CouchDB object.
+# We can't clone Map because rows which view returns can have same keys.
+CouchDBView := Object clone do(
+  //doc CouchDBView db CouchDB object.
   db          ::= nil
-  //doc CouchDBViewResponse totalSize View's total size
+  //doc CouchDBView totalSize View's total size
   totalSize   ::= nil
   offset      ::= nil
-  //doc CouchDBViewResponse documentIds List of document ids to which rows belong.
+  //doc CouchDBView documentIds List of document ids to which rows belong.
   documentIds ::= nil
   rows        ::= nil
 
-  with := method(db, response,
+  with := method(response, db,
     _rows := response["rows"]
     self clone\
       setDb(db)\
@@ -217,29 +218,29 @@ CouchDBViewResponse := Object clone do(
       setDocumentIds(_rows map(["id"]))\
       setRows(_rows))
 
-  //doc CouchDBViewResponse documents CouchDoc's of all result rows. 
+  //doc CouchDBView documents CouchDoc's of all result rows. 
   documents := lazySlot(
     self documentIds map(id, self db[id]))
   
-  //doc CouchDBViewResponse documentAt(index) Returns CouchDoc with ID which is at n-th row. 
+  //doc CouchDBView documentAt(index) Returns CouchDoc with ID which is at n-th row. 
   documentAt := method(index,
     if(self getSlot("documents") isKindOf(List),
       self documents[index],
       self db[self documentIds[index]]))
   
-  //doc CouchDBViewResponse at(index) Returns row at <code>index</code>.
+  //doc CouchDBView at(index) Returns row at <code>index</code>.
   at := method(index,
     self rows at(index); self)
-  //doc CouchDBViewResponse squareBrackets(index) Alias of <code>CouchDBViewResponse at()</code>.
+  //doc CouchDBView squareBrackets(index) Alias of <code>CouchDBViewResponse at()</code>.
   squareBrackets := getSlot("at")
 
-  //doc CouchDBViewResponse keys() Returns list of all keys provided by view response.
+  //doc CouchDBView keys() Returns list of all keys provided by view response.
   keys := method(self rows map(["key"]))
   
-  //doc CouchDBViewReponse values() Returns list of all values.
+  //doc CouchDBView values() Returns list of all values.
   values := method(self rows map(["value"]))
   
-  //doc CouchDBViewResponse size Returns size rows returned by CouchDB.
+  //doc CouchDBView size Returns size rows returned by CouchDB.
   size := method(self rows size)
 )
 

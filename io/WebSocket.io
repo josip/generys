@@ -70,6 +70,8 @@ WebSocket := Object clone do(
   origins     ::= "*"
   //doc WebSocket resource Path at which connection has been established. (URL path, set automatticaly from <code>Controller createWebSocket</code> to the path of request).
   resource    ::= "default"
+  //doc WebSocket channel Channel to which <code>self</code> is subscribed to (if any).
+  channel         ::= nil
 
   //doc WebSocket requestHeaders Headers of the request, as given by Volcano.
   requestHeaders  ::= nil
@@ -195,6 +197,7 @@ WebSocket := Object clone do(
     try(self handler handleSocketClose)
     self handler = nil
     self socket _close
+    self channel ?unsubscribe(self)
     Generys webSockets removeAt(self name))
 
   _messageBeginMarker     := Sequence clone append(0x0000)

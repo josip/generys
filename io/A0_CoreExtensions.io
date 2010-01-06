@@ -29,7 +29,7 @@ Object do(
 )
 
 /*doc List squareBrackets
-Allows access to List, Map and Sequence elements with syntax common to other languages.
+Allows access to List, Map and Sequence elements with syntax common in other languages.
 <code><pre>
 Io> colours := ["Brown", "Blue", "Violet sky"]
 ==> list("Brown", "Blue", "Violet sky")
@@ -39,7 +39,7 @@ Io> colours[1,2]
 => list("Blue", "Violet sky")
 Io> prices["chocolate"]
 ==> 12.25
-Io> prices["chocolate", "strawberry"] reduce(+)
+Io> prices["chocolate", "strawberry"] sum
 ==> 25.75
 </pre></code>*/
 List squareBrackets := Map squareBrackets := Sequence squareBrackets := method(
@@ -62,17 +62,39 @@ nil ifTrue  := method(nil)
 //doc nil ifFalse(code)  Calls and returns result of <code>code</code>.
 nil ifFalse := method(call evalArgAt(0))
 
-//doc Message setArgAt(index, value) Clones message arguments and replaces value of argument at <code>index</code>.
+//doc Message setArgAt(index, value) Clones message arguments and replaces value of a argument at <code>index</code>.
 Message setArgAt := method(index, arg,
   self setArguments(self arguments clone atPut(index, arg)))
+
+Map do(
+  //doc Map fromKeysAndValues(keys, values) Creates new values from list of keys and values.
+  fromKeysAndValues := method(keys, values,
+    self clone addKeysAndValues(keys, values))
+
+  //doc Map mapValues(key, value, message)
+  mapValues := method(
+    Map fromKeysAndValues(self keys, call delegateToMethod(self, "map")))
+
+  //doc Map removeIf(key, value, message) Removes all properties for which <code>message</code> returns <code>true</code>.
+  removeIf := method(
+    result := self clone
+    call delegateToMethod(result, "select") foreach(k, v, result removeAt(k))
+    result)
+)
+
+List do (
+  //doc Map removeIf(key, value, message) Removes all items for which <code>message</code> is <code>true</code>.
+  removeIf := Map getSlot("removeIf")
+)
 
 Date do(
   //doc Date asHTTPDate() Returns Date as Sequence in HTTP format.
   asHTTPDate := method(
     self asString("%a, %d %b %Y %H:%M:%S %Z"))
 
-  //doc Date asJson() Alias of <code>Date asString</code>.
-  asJson := method(self asString asJson)
+  //doc Date asJson() Converts date to UTC and converts it to format which most JSON parsers understand.
+  asJson := method(
+    self convertToUTC asString("%Y-%m-%dT%H:%M:%SZ") asJson)
 )
 
 Directory do(
