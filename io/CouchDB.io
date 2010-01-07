@@ -129,7 +129,7 @@ CouchDoc := Map clone do(
   
   //doc CouchDoc from(map) Converts Map to CoucDoc. 
   from := method(obj,
-    obj ifNil(return(nil))
+    obj ifNil(Exception raise("Trying to create CouchDoc from nil."))
 
     if(obj["ioType"] isNil or obj["ioType"] == self type,
       self clone merge(obj)
@@ -323,15 +323,15 @@ Io> IceCream["chocolate"] == chocolate
     self)
 
   //doc CouchDocTemplate new(properties) Creates new CouchDoc and sets <em>ioType</em> property.
-  new := method(theProperties,
-    #doc := self docProto from(theProperties removeIf(k, v, self properties contains(k) not))
-    doc := self docProto from(theProperties)
+  new := method(props,
+    doc := self docProto from(props select(k, v, self properties contains(k)))
+    #doc := self docProto from(theProperties)
     doc atPut("ioType", self type)
     doc)
   
   //doc CouchDocTemplate create(properties) Creates new CouchDoc and creates it in database.
-  create := method(theProperties,
-    self new(theProperties) create)
+  create := method(props,
+    self new(props) create)
   
   //doc CouchDocTemplate at(id) Returns CouchDoc with <code>docProto</code> methods.
   at := method(id, self docProto from(self db[id]))

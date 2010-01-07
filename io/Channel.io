@@ -12,7 +12,7 @@ Channel provides seamless integration of FutureResponse and WebSocket implementa
     subscriber setChannel(self)
     self subscribers append(subscriber)
     subscriber)
-    
+  
   //doc Channel unsubscribe(subscriber) Removes subscriber from self. Returns <code>self</code>.
   unsubscribe := method(subscriber,
     subscriber setChannel(nil)
@@ -24,21 +24,19 @@ Channel provides seamless integration of FutureResponse and WebSocket implementa
   <p><code>excludeList</code> can contain list of subscribers (their <code>name</code> properties) to which message won't be sent.</p>*/
   send := method(msg, excludeList,
     excludeList ifNil(excludeList = [])
-    
-    self subscribers foreach(subscriber,
-      excludeList contains(subscriber name) ifFalse(
-        subscriber send(msg) ?finish))
 
     sentTo := self subscribers select(subscriber,
-      excludeList contains(subscriber name) not ifTrue(subscriber send(msg) ?finish)) size
+      excludeList contains(subscriber name) not ifTrue(
+        subscriber send(msg) ?finish)) size
 
-    log debug("Sent message to #{sentTo} subscribers (#{exclude size} subscribers excluded)")
+    log debug("[Channel] Message sent to #{sentTo} subscribers (#{excludeList size} subscribers excluded)")
 
+    # Cache is for FutureResponse
     cache append(msg)
     if(cache size >= cacheSize, cache removeFirst)
 
     msg)
 
   //doc Channel streamFor(subscriberName) Returns FutureResponse or WebSocket with provided name
-  streamFor := method(streamName, subscribers select(name == streamName) at(0))
+  streamFor := method(streamName, subscribers select(name == streamName) first)
 )

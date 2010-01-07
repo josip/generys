@@ -74,17 +74,6 @@ Map do(
   //doc Map mapValues(key, value, message)
   mapValues := method(
     Map fromKeysAndValues(self keys, call delegateToMethod(self, "map")))
-
-  //doc Map removeIf(key, value, message) Removes all properties for which <code>message</code> returns <code>true</code>.
-  removeIf := method(
-    result := self clone
-    call delegateToMethod(result, "select") foreach(k, v, result removeAt(k))
-    result)
-)
-
-List do (
-  //doc Map removeIf(key, value, message) Removes all items for which <code>message</code> is <code>true</code>.
-  removeIf := Map getSlot("removeIf")
 )
 
 Date do(
