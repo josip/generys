@@ -48,13 +48,13 @@ RouteMatch is the object with which you operate in routes.io. It provides method
 */
   route ::= nil
 
-  //metadoc RouteMatch with(pattern) Returns RouteMatch and assigns newly created Route.
+  //doc RouteMatch with(pattern) Returns RouteMatch and assigns newly created Route.
   with := method(pattern, self clone setRoute(Route with(pattern)))
 
-  /*metadoc RouteMatch to(options)
-  Binds pattern with controller.
+  /*doc RouteMatch to(options)
+  <p>Binds pattern with controller.
   <code>options</code> can be an Method or a Map with <code>controller</code> and <code>action</code> properties.
-  
+  </p><p>
   Example:
   <pre><code>
   Router do(
@@ -63,25 +63,29 @@ RouteMatch is the object with which you operate in routes.io. It provides method
     connect("/time") to(method(request, response, Date now asString))
 
     connect("/") to({controller: "StaticPages"}) # action: index
-  )</code></pre>*/
+  )</code></pre></p>*/
   to := method(
     if(call argAt(0) name == "method",
-      route responseMethod := call evalArgAt(0),
-      call evalArgAt(0) foreach(k, v, route setSlot(k, v)))
+      self route responseMethod := call evalArgAt(0),
+      call evalArgAt(0) foreach(k, v, self route setSlot(k, v)))
     self)
-  //metadoc RouteMatch from() Same as <code>RouteMatch to</code>
+  //metadoc RouteMatch from() Same as <code>RouteMatch to</code>.
   from := getSlot("to")
 
-  /*metadoc RouteMatch ifHttpMethod() 
-  Route will respond only to given HTTP verbs. You can provide more than one HTTP verb (uppercased).
-  ex.:
-  <pre><code>
-  Router connect("/sessions/delete") ifHttpMethod("DELETE", "POST")</code></pre>*/
-  ifHttpMethod := method(
-    route setHttpMethods(call message arguments)
+  //doc RouteMatch ifHttpMethod(httpVerb) Same as <code>RouteMatch ifHttpMethods</code>.
+  ifHttpMethod := method(verb,
+    self route setHttpMethods(list(verb))
+    self)
+  
+  /*doc RouteMatch ifHttpMethods(...) 
+  Route will respond only to given HTTP verbs. You can provide more than one HTTP verb (all uppercased).
+  Example:
+  <pre><code>Router connect("/sessions/delete") ifHttpMethods("DELETE", "POST")</code></pre>*/
+  ifHttpMethods := method(
+    self route setHttpMethods(call evalArgs)
     self)
 
-  /*metadoc RouteMatch as(name)
+  /*doc RouteMatch as(name)
   Gives name to assinged route.
   This name can be later used from controller for redirections or generating links:
   
@@ -242,7 +246,7 @@ CarsController := Controller clone do(
 
   /*doc ResourceMatch connectToSource(pattern, slotName)
   Creates route for other controller's slots. Returns self.
-  These slots will be available on <code>/#{resourceName}/#{pattern}</code>
+  These slots will be available on <code>/#{resourceName}s/#{pattern}</code>
   */
   connectToSource := method(pattern, slotName,
     Router connect(self controllerPath .. "/" .. pattern) to({controller: self name, action: slotName})
@@ -250,7 +254,7 @@ CarsController := Controller clone do(
 
   /*doc ResourceMatch allowSlotsOnResource(pattern, slotName)
   Creates routes for defined controller's slots. Returns self.
-  These slots will be available on <code>/#{resourceName}s/:id/#{pattern}</code> 
+  These slots will be available on <code>/#{resourceName}/:id/#{pattern}</code> 
   */
   connectToResource := method(pattern, slotName,
     Router connect(self resourcePath .. "/" .. pattern) to({controller: self name, action: slotName})
@@ -260,7 +264,7 @@ CarsController := Controller clone do(
   hasOne := method(resourceName, self)
   //doc ResourceMatch hasMany(resourceName)
   hasMany := method(resourceName,
-    ResourceMatch with(self name .. "/" .. resourceName); self)
+    ResourceMatch with(self name .. "/" .. resourceName))
 )
 
 Route := Object clone do(
@@ -286,32 +290,36 @@ but the end-user should never directly use it
   
   Example:
   <pre><code>
-  Io> r := Route with("/:resource/ *path")
+  Io> r := Route with("/:resource/<!-- O.o-->*path")
   Io> r patternMatches all map(string)
   ==> list(":resource", "*path")</code></pre>*/
   patternMatches := lazySlot(pattern matchesOfRegex("[:|\\*](\\w)+"))
 
   /*doc Route namedCaptures
-  Removes ":" and "*" from strings returned by <code>Route patternMatches</code>. Returns List.*/
+  Removes ":" and "*" from strings returned by <code>Route fullNamedCaptures</code>. Returns List.*/
   namedCaptures := method(
-    pattern ifNil(return [])
-    self namedCaptures = self patternMatches map(part,
-      if(part hasSlot("at"), part at(0) exSlice(1))))
+    pattern ifNil(return([]))
+    self namedCaptures = self fullNamedCaptures map(exSlice(1)))
+
+  //doc Route fullNamedCaptures Returns matches of URL pattern (with ":" or "*" at beginning) as List of Sequences.
+  fullNamedCaptures := method(
+    pattern ifNil(return([]))
+    self fullNamedCaptures = self patternMatches map(part,
+      if(part hasSlot("at"), part at(0), nil)) select(isNil not))
 
   /*doc Route mapToPath(path)
   Maps <code>Route namedCaptures</code> to values from real path. Returns Map.
   <br/>
   Example:
   <pre><code>
-  Io> r mapToPath("/chocolate/swiss/dark") asJson
+  Io> Route with("/:resource/<!-- o.O -->*path") mapToPath("/chocolate/swiss/dark") asJson
   ==> {"resource": "chocolate", "path": "swiss/dark"}</code></pre>*/
   mapToPath := method(path,
-    values := path allMatchesOfRegex(self asRegex)
-    if(values isKindOf(List) and (values size > 0),
-      values = values[0] ?captures ?exSlice(1),
-      values = [])
-
-    Map clone addKeysAndValues(self namedCaptures, values))
+    self asRegex ifNil(return(Map clone))
+    values := path allMatchesOfRegex(self asRegex) remove(nil)
+    if(values isKindOf(List) and(values isEmpty not),
+      Map clone addKeysAndValues(self namedCaptures, values[0] ?captures ?exSlice(1)),
+      Map clone))
 
   //doc Route respondsTo(path, httpMethod) Returns <code>true</code> if path matches defined pattern. Otherwise, <code>false</code>.
   respondsTo := method(path, httpMethod,
@@ -319,20 +327,21 @@ but the end-user should never directly use it
     captures := self mapToPath(path)
 
     # Do not ask what this does
-    # It's an uber smart algorithm for calculating meaning of life, universe and everything
+    # It's a uber smart algorithm for calculating meaning of life, universe and everything.
     (path == self pattern)\
       or((captures values remove(nil) size > 0)\
         and(captures keys sort == self namedCaptures sort)))
 
-  //doc Route asRegex Returns RegEx which can be tested agains paths.
+  //doc Route asRegex Returns RegEx which can be tested agains URLs.
   asRegex := method(
-    self pattern ifNil(return nil)
+    self pattern ifNil(return(nil))
 
-    replaceRegex := if(self pattern contains("*"[0]), "([^\\?:]*)", "([^/\\?:]*)")
-    re := self patternMatches replaceAllWith(replaceRegex)
-    re = if(re exSlice(-1) == "/", re .. "?", re .. "/?") asRegex
-    
-    self asRegex = re)
+    re := self pattern clone asMutable
+    self fullNamedCaptures foreach(match,
+      re replaceSeq(match, if(match[0] asCharacter == "*", "([^\\?:]*)", "([^/\\?\\:]*)")))
+    re = "^" .. re .. (if(re exSlice(-1) == "/", "?", "/?$"))
+
+    self asRegex = re asRegex)
 
   /*doc Route interpolate(context)
   Interpolate route's pattern. <code>context</code> can be either Map, either Object.
@@ -342,14 +351,14 @@ but the end-user should never directly use it
   Io> r interpolate({resource: "iceCream", path: "ledo/strawberry"})
   ==> "/iceCream/ledo/strawberry"</code></pre>*/
   interpolate := method(context,
-    self pattern ifNil(return "")
+    self pattern ifNil(return(""))
 
     context ifNil(context = call sender)
     context isKindOf(Map) ifTrue(context = context asObject)
 
     seq := pattern clone asMutable
-    self namedCaptures foreach(part,
-      seq replaceSeq(":" .. part, context perform(part)))
+    self fullNamedCaptures foreach(match,
+      seq replaceSeq(match, context perform(match exSlice(1)) asString))
 
     seq)
 )
