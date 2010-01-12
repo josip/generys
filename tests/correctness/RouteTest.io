@@ -6,6 +6,7 @@ RouteTest := UnitTest clone do(
     self files   := Route cloneWithoutInit setPattern("/users/:userId/*path") setHttpMethods(["GET"])
     self empty   := Route cloneWithoutInit)
 
+  # patternMatches method is being indirectly tested by testNamedCaptures
   #testPatternMatches := method(
   #  assertEquals(self car   patternMatches,   [":carId"])
   #  assertEquals(self tasks patternMatches, [":userId", ":taskId"])

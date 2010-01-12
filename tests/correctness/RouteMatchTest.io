@@ -4,7 +4,7 @@ RouteMatchTest := UnitTest clone do(
       ifHttpMethods("GET", "POST")\
       to({controller: "Time", action: "show"})\
       as("time") route)
- 
+
   testAdditionToGenerysRoutesList := method(
     assertTrue(Generys routes map(name) contains("time")))
 

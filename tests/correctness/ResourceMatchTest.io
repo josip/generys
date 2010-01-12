@@ -7,7 +7,7 @@ ResourceMatchTest := UnitTest clone do(
   testPaths := method(
     assertEquals(self user controllerPath,  "/users")
     assertEquals(self user resourcePath,    "/user/:id"))
-  
+
   testRoutes := method(
     assertRoutesExist(
       "listUsers",  "newUser",    "createUser",
@@ -26,18 +26,18 @@ ResourceMatchTest := UnitTest clone do(
       "showUsersFavourite",   "updateUsersFavourite", "destroyUsersFavourite")
 
     assertEquals(getRoute("listUsersFavourites") controller, "UsersFavourites"))
-  
+
   testConnectToSource := method(
     favesCount := self faves connectToSource("count", "showFaveCount") as("countFavourites") route
 
     assertRouteExists("countFavourites")
     assertEquals(favesCount action, "showFaveCount")
     assertEquals(favesCount pattern, "/users/favourites/count"))
-  
+
   testConnectToResource := method(
-    sendFave := self faves connectToSource("send/:userId", "sendFave") as("sendFaveToUser") route
-    
+    sendFave := self faves connectToResource("send/:userId", "sendFave") as("sendFaveToUser") route
+
     assertRouteExists("sendFaveToUser")
     assertEquals(sendFave action, "sendFave")
-    assertEquals(sendFave pattern, "/users/favourites/:id/send/:userId"))
+    assertEquals(sendFave pattern, "/users/favourite/:id/send/:userId"))
 )

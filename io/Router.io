@@ -255,12 +255,13 @@ CarsController := Controller clone do(
   connectToResource := method(pattern, slotName,
     Router connect((self resourcePath) .. "/" .. pattern) to({controller: self name, action: slotName}))
 
-  //doc ResourceMatch hasOne() <strong>Not implemented!</strong> Returns <code>self</code>.
+  //doc ResourceMatch hasOne() Not implemented. Returns <code>self</code>.
   hasOne := method(resourceName, self)
+  
   //doc ResourceMatch hasMany(resourceName)
   hasMany := method(resourceName,
-    (resourceName exSlice(-1) == "s") ifTrue(resourceName = resourceName exSlice(0,-1))
-    ResourceMatch with(self name .. "/" .. resourceName))
+    (resourceName exSlice(-1) == "s") ifTrue(resourceName = resourceName exSlice(0, -1))
+    ResourceMatch with((self name) .. "/" .. resourceName))
 )
 
 Route := Object clone do(

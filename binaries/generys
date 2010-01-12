@@ -71,7 +71,7 @@ Menu := Object clone do(
     path = if(path isNil, Directory currentWorkingDirectory, Path absolute(path))
     path = path .. "tests/correctness"
     " - Running tests in #{path}" interpolate println
-    
+
     # run.io Relies on System launchPath 
     System launchPath = path
     doFile(path .. "/run.io")
