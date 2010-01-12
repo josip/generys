@@ -209,61 +209,57 @@ CarsController := Controller clone do(
 
   //doc ResourceMatch with(resourceName)
   with := method(name,
-    self cloneWithoutInit setName(name) init)
+    self clone setName(name) setup)
 
-  init := method(
+  //doc ResourceMatch setup() Installs resource methods.
+  setup := method(
     self controllerPath = ("/" .. (self name) .. "s") asLowercase
     self resourcePath =  ("/" .. (self name) .. "/:id") asLowercase
-    if(self name containsSeq("/"),
-      _name := self name split("/") map(makeFirstCharacterUppercase)
-      nameSingular := _name first
-      self name = _name join("") .. "s"
-    ,
-      nameSingular := name
-      self name = name .. "s"
-    )
+    nameSingular := if(self name containsSeq("/"),
+      self name split("/") map(makeFirstCharacterUppercase) join(""),
+      name)
+    self name = nameSingular .. "s"
     
-    Router GET(controllerPath)\
+    Router GET(self controllerPath)\
       from({controller: self name,   action: "index"})\
       as("list" .. name)
-    Router GET(controllerPath .. "/new")\
+    Router GET(self controllerPath .. "/new")\
       from({controller: self name,   action: "new"})\
       as("new" .. nameSingular)
-    Router POST(controllerPath)\
+    Router POST(self controllerPath)\
       to({controller: self name, action: "create"})\
       as("create" .. nameSingular)
-    Router GET(resourcePath)\
+    Router GET(self resourcePath)\
       from({controller: self name, action: "show"})\
       as("show" .. nameSingular)
-    Router PUT(resourcePath)\
+    Router PUT(self resourcePath)\
       to({controller: self name, action: "update"})\
       as("update" .. nameSingular)
-    Router DELETE(resourcePath)\
+    Router DELETE(self resourcePath)\
       from({controller: self name, action: "destroy"})\
       as("destroy" .. nameSingular)
     
     self)
 
   /*doc ResourceMatch connectToSource(pattern, slotName)
-  Creates route for other controller's slots. Returns self.
+  Creates route for other controller's slots. Returns RouteMatch with newly created route.
   These slots will be available on <code>/#{resourceName}s/#{pattern}</code>
   */
   connectToSource := method(pattern, slotName,
-    Router connect(self controllerPath .. "/" .. pattern) to({controller: self name, action: slotName})
-    self)
+    Router connect((self controllerPath) .. "/" .. pattern) to({controller: self name, action: slotName}))
 
   /*doc ResourceMatch allowSlotsOnResource(pattern, slotName)
-  Creates routes for defined controller's slots. Returns self.
+  Creates routes for defined controller's slots. Returns RouteMatch with newly created route.
   These slots will be available on <code>/#{resourceName}/:id/#{pattern}</code> 
   */
   connectToResource := method(pattern, slotName,
-    Router connect(self resourcePath .. "/" .. pattern) to({controller: self name, action: slotName})
-    self)
+    Router connect((self resourcePath) .. "/" .. pattern) to({controller: self name, action: slotName}))
 
   //doc ResourceMatch hasOne() <strong>Not implemented!</strong> Returns <code>self</code>.
   hasOne := method(resourceName, self)
   //doc ResourceMatch hasMany(resourceName)
   hasMany := method(resourceName,
+    (resourceName exSlice(-1) == "s") ifTrue(resourceName = resourceName exSlice(0,-1))
     ResourceMatch with(self name .. "/" .. resourceName))
 )
 
