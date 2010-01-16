@@ -122,11 +122,18 @@ CouchDoc := Map clone do(
 //metadoc CouchDoc category Networking
 //metadoc CouchDoc description Map with extra methods for easier interaction with CouchDB
   db    ::= nil
-  radio  := nil
   
   init := method(
-    self radio := Radio clone)
-  
+    self notifications := Object clone
+    ["Create", "Update", "Delete" "Save"] foreach(notif,
+      self notifications setSlot("before" .. notif, Notification clone\
+        setName("before" .. notif)\
+        setSender(self))
+      
+      self notifications setSlot("after" .. notif, Notification clone\
+        setName("after" .. notif)\
+        setSender(self))))
+
   //doc CouchDoc from(map) Converts Map to CoucDoc. 
   from := method(obj,
     obj ifNil(Exception raise("Trying to create CouchDoc from nil."))
@@ -157,20 +164,20 @@ CouchDoc := Map clone do(
     id ifNil(Exception raise("Document is missing '_id' property, could not delete it"))
     rev ifNil(Exception raise("Document is missing '_rev' propery, could not delete it"))
 
-    self radio emit("beforeDelete", self)
+    self notifications beforeDelete post
     req := URL with(self db url .. id .. "?rev=" .. rev)
     resp := req delete
     self db parseStatusCode(req statusCode) ifTrue(
       self isDeleted := true
-      self radio emit("afterDelete")))
+      self notifications afterDelete post)))
 
   /*doc CouchDoc update()
   Saves document to database.
   Emits <code>beforeUpdate</code> and <code>afterUpdate</code> events.*/
   update  := method(
-    self radio emit("beforeUpdate", self)
+    self notifications beforeUpdate post
     self db atPut(id, self)
-    self radio emit("afterUpdate", self)
+    self notifications afterUpdate post
     self)
   //doc CouchDoc save() Alias of <code>CouchDoc update()</code>.
   save    := getSlot("update")
@@ -179,23 +186,31 @@ CouchDoc := Map clone do(
   Creates document in the database.
   Emits <code>beforeCreate</code> and <code>afterCreate</code> events.*/
   create  := method(
-    self radio emit("beforeCreate", self)
+    self notifications beforeCreate post
     self db atPut(self) ifTrue(
-      self radio emit("afterCreate", self))
+      self notifications afterCreate post)
     self)
 
-  //doc CouchDoc listenTo(channel, callback) Subscribes callback to event on CouchDoc's radio.
-  listenTo := method(channel, callback, self radio listenTo(channel, callback); self)
-  
-  //doc CouchDoc before(event, callback) Subscribe callback to an <em>before</em> event.
-  before := method(event, callback,
-    self listenTo("before" .. (event makeFirstCharacterUppercase), callback)
-    self)
+  /*doc CouchDoc listenTo(event, slotName[, target])
+  Subscribes callback to an event on <code>self</code> instance.
+  If <code>target</code> is provided, its slot <code>slotName</code> will be called.<br/>
+  Returns <code>NotificationListener</code>.*/
+  listenTo := method(event, slotName, target,
+    target ifNil(target = self)
+    NotificationListener clone\
+      setTarget(target)\
+      setSender(self)\
+      setName(event)\
+      setAction(slotname)\
+      start)
 
-  //doc CouchDoc after(event, callback) Subscribe callback to an <em>after</em> event.
-  after := method(event, callback,
-    self listenTo("after" .. (event makeFirstCharacterUppercase), callback)
-    self)
+  //doc CouchDoc before(event, slotName[, target]) Subscribe callback to an <em>before</em> event.
+  before := method(event, slotName, target,
+    self listenTo("before" .. (event makeFirstCharacterUppercase), slotName, target))
+
+  //doc CouchDoc after(event, slotName[, target]) Subscribe callback to an <em>after</em> event.
+  after := method(event, slotName, target,
+    self listenTo("after" .. (event makeFirstCharacterUppercase), slotName, target))
 )
 
 # We can't clone Map because rows which view returns can have same keys.
