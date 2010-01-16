@@ -45,7 +45,7 @@ Generys := HttpServer clone do (
   loadConfig := method(
     self config = (doFile((self envDir) .. "/config.json") asObject) appendProto(self config))
 
-  //doc Generys serve() Call this method to fireup old Generys.
+  //doc Generys serve() Call this method to fireup Generys.
   serve := method(
     self loadConfig
     self staticDir := Generys root .. "/static"
@@ -91,3 +91,7 @@ Generys := HttpServer clone do (
 )
 //doc Generys clone Returns Generys (singleton).
 Generys clone := Generys
+
+System userInterruptHandler = method(
+  log info("Generys has been put to sleep.")
+  Generys stop)
