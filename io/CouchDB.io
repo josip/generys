@@ -125,14 +125,12 @@ CouchDoc := Map clone do(
   
   init := method(
     self notifications := Object clone
-    ["Create", "Update", "Delete" "Save"] foreach(notif,
-      self notifications setSlot("before" .. notif, Notification clone\
-        setName("before" .. notif)\
-        setSender(self))
+    ["Create", "Update", "Delete", "Save"] foreach(notif,
+      self notifications setSlot("before" .. notif,
+        Notification clone setName("before" .. notif) setSender(self))
       
-      self notifications setSlot("after" .. notif, Notification clone\
-        setName("after" .. notif)\
-        setSender(self))))
+      self notifications setSlot("after" .. notif,
+        Notification clone setName("after" .. notif) setSender(self))))
 
   //doc CouchDoc from(map) Converts Map to CoucDoc. 
   from := method(obj,
@@ -169,15 +167,15 @@ CouchDoc := Map clone do(
     resp := req delete
     self db parseStatusCode(req statusCode) ifTrue(
       self isDeleted := true
-      self notifications afterDelete post)))
+      self notifications afterDelete post))
 
   /*doc CouchDoc update()
   Saves document to database.
   Emits <code>beforeUpdate</code> and <code>afterUpdate</code> events.*/
   update  := method(
     self notifications beforeUpdate post
-    self db atPut(id, self)
-    self notifications afterUpdate post
+    self db atPut(id, self) ifTrue(
+      self notifications afterUpdate post)
     self)
   //doc CouchDoc save() Alias of <code>CouchDoc update()</code>.
   save    := getSlot("update")
@@ -201,7 +199,7 @@ CouchDoc := Map clone do(
       setTarget(target)\
       setSender(self)\
       setName(event)\
-      setAction(slotname)\
+      setAction(slotName)\
       start)
 
   //doc CouchDoc before(event, slotName[, target]) Subscribe callback to an <em>before</em> event.
