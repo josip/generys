@@ -31,7 +31,7 @@ ZooController := Controller clone do(
     self redirectToRoute("zooEntrance"))
   
   buyToy := method(id, toy,
-    self visitors select(== id) first
+    self visitors detect(== id)
     self session toys append(toy))
   
   _zooShouldBeOpen := method(
@@ -177,7 +177,7 @@ ZooController := Controller clone do(
   redirectToRoute := method(routeName, params,
     params ifNil(params = Map clone)
     
-    route := Generys routes select(name == routeName) first
+    route := Generys routes detect(name == routeName)
     route ifNil(Exception raise("Could not find route named '#{routeName}'" interpolate))
     
     self redirectTo(route interpolate(params)))

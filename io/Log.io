@@ -1,17 +1,15 @@
 Log := Object clone do(
 //metadoc Log description Logging utility
-  symbols := [
-    ["debug", "#"],
-    ["info",  "-"],
-    ["error", "!"]
-  ]
+  symbols := list(
+    list("debug", "#"),
+    list("info",  "-"),
+    list("error", "!"))
 
-  //doc log print(message, logLevel)
-  _logLevel := symbols map(s, s at(0) == Generys config level) indexOf(true)
-  _shouldPrint := Generys config shouldPrint
+  //doc Log print(message, logLevel)
+  _logLevel := symbols map(at(0) == Generys config logLevel) indexOf(true)
   print := method(seq, level,
     msg := " #{symbols[level][1]} [#{Date now}] #{seq}" interpolate
-    if((level <= (self _logLevel)) and(self _shouldPrint),
+    (level <= self _logLevel) ifTrue(
       msg println)
     self write(msg))
 
@@ -23,11 +21,11 @@ Log := Object clone do(
       self _logFile appendToContents(msg))
   )
 
-  //doc log debug(message) Prints debug message.
+  //doc Log debug(message) Prints debug message.
   debug := method(seq, self @print(seq interpolate(call sender), 0))
-  //doc log info(message) Prints info message.
+  //doc Log info(message) Prints info message.
   info  := method(seq, self @print(seq interpolate(call sender), 1))
-  //doc log error(message) Prints error message.
+  //doc Log error(message) Prints error message.
   error := method(seq, self @print(seq interpolate(call sender), 2))
 )
-log := log
+log := Log

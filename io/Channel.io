@@ -38,5 +38,5 @@ Channel provides seamless integration of FutureResponse and WebSocket implementa
     msg)
 
   //doc Channel streamFor(subscriberName) Returns FutureResponse or WebSocket with provided name
-  streamFor := method(streamName, subscribers select(name == streamName) first)
+  streamFor := method(streamName, subscribers detect(name == streamName))
 )

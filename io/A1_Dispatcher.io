@@ -100,12 +100,12 @@ An HTTP request dispatcher, it is responsible for selecting right route dependin
     rtype := ctrlResp type
     rformatters := Generys formatters reverse
     
-    formatter := rformatters select(f,
+    formatter := rformatters detect(f,
       (f ?respondsToType == rtype) or (f ?respondsToTypes contains(rtype)))
-    formatter isEmpty ifTrue(
-      formatter := rformatters select(f, f test(ctrlResp)))
+    formatter ifNil(
+      formatter := rformatters detect(f, f test(ctrlResp)))
 
-    if(formatter isEmpty,
+    if(formatter isNil,
       ctrlResp asString,
-      formatter first format(ctrlResp, resp, req)))
+      formatter ?format(ctrlResp, resp, req)))
 )

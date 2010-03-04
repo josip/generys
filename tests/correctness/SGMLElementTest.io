@@ -46,7 +46,7 @@ SGMLElementTest := UnitTest clone do(
     assertTrue(lis containsAll(doc find("ul li")))
     assertEquals(doc find("a") first, link)
     assertEquals(doc find("li a") first, link)
-    assertEquals(doc find("li.lastInList") first, lis select(l, l attribute("class") == "lastInList") first))
+    assertEquals(doc find("li.lastInList") first, lis detect(attribute("class") == "lastInList")))
 
   testAppend := method(
     doc findFirst("body") append("""<hr/><p>Hai</p>""")
