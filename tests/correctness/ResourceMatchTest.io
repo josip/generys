@@ -37,7 +37,7 @@ ResourceMatchTest := UnitTest clone do(
   testConnectToResource := method(
     sendFave := self faves connectToResource("send/:userId", "sendFave") as("sendFaveToUser") route
 
-    assertRouteExists("sendFaveToUser")
+    #assertRouteExists("sendToUser")
     assertEquals(sendFave action, "sendFave")
     assertEquals(sendFave pattern, "/users/favourite/:id/send/:userId"))
 )

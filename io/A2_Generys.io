@@ -21,7 +21,7 @@ Generys := HttpServer clone do (
   sessions    := nil
   //doc Generys webSockets List of all open <em>WebSocket</em>s.
   webSockets  := Map clone
-  //doc Generys futureRespones List of all <em>FutureResponses</em>s.
+  //doc Generys futureRespones List of all cloned <em>FutureResponse</em>s.
   futureResponses := Map clone
   
   //doc Generys config Object holding configuration.
@@ -35,17 +35,18 @@ Generys := HttpServer clone do (
     useXSendFileHeader  := false
     logLevel            := "debug"
     logFile             := nil
+    
     env                 := "dev"
   )
   //doc Generys serverURL Returns complete URL, including protocol, port and prefix.
   serverURL := lazySlot("http://#{host}:#{port}#{urlPrefixPath}" interpolate(self config))
   envDir    := lazySlot(self root .. "/config/env/" .. (self config env))
 
-  //doc Generys loadConfig() Loads configuration file for current environment.
+  //doc Generys loadConfig Loads configuration file for current environment.
   loadConfig := method(
     self config = (doFile((self envDir) .. "/config.json") asObject) appendProto(self config))
 
-  //doc Generys serve() Call this method to fireup Generys.
+  //doc Generys serve Call this method to fireup Generys.
   serve := method(
     self loadConfig
     self staticDir := Generys root .. "/static"
@@ -60,13 +61,13 @@ Generys := HttpServer clone do (
     Directory with(self root .. "/app/controllers") doFiles
     Directory with(self root .. "/lib") doFiles
 
-    self setHost(self config host)
-    self setPort(self config port)
+    self  setHost(self config host)\
+          setPort(self config port)
 
-    log info("You can find Generys on route #{self config host} at mile #{self config port}")
-    
+    log info("You can find Generys on route #{self config host} near exit ##{self config port}")
+
     self start)
-  
+
   /*doc Generys renderResponse(request, response)
   Passes handling to Dispatcher. This method is called by HttpServer, therefore not for end users. */
   renderResponse := method(req, resp,

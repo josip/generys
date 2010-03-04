@@ -19,12 +19,12 @@ Object do(
       map atPut(arg name, arg next next doInContext(call sender)))
     map)
 
-  //doc Object asMap() Converts Object to Map
+  //doc Object asMap Converts Object to Map
   asMap := method(
     slots := self slotNames map(slotName, self getSlot(slotName))
     Map clone addKeysAndValues(self slotNames, slots))
 
-  //doc Object asJson() Converts Object to JSON Sequence.
+  //doc Object asJson Converts Object to JSON Sequence.
   asJson := method(self asMap asJson)
 )
 
@@ -57,7 +57,7 @@ List squareBrackets := Map squareBrackets := Sequence squareBrackets := method(
 Block proto asJson := "null"
 //doc nil asJson Returns "null".
 nil asJson  := "null"
-//doc nil ifTrue() Returns <code><nil/code>.
+//doc nil ifTrue Returns <code><nil/code>.
 nil ifTrue  := method(nil)
 //doc nil ifFalse(code)  Calls and returns result of <code>code</code>.
 nil ifFalse := method(call evalArgAt(0))
@@ -77,17 +77,17 @@ Map do(
 )
 
 Date do(
-  //doc Date asHTTPDate() Returns Date as Sequence in HTTP format.
+  //doc Date asHTTPDate Returns Date as Sequence in HTTP format.
   asHTTPDate := method(
     self asString("%a, %d %b %Y %H:%M:%S %Z"))
 
-  //doc Date asJson() Converts date to UTC and converts it to format which most JSON parsers understand.
+  //doc Date asJson Converts date to UTC and converts it to format which most JSON parsers understand.
   asJson := method(
     self convertToUTC asString("%Y-%m-%dT%H:%M:%SZ") asJson)
 )
 
 Directory do(
-  //doc Directory doFiles() Executes all .io files in given directory. 
+  //doc Directory doFiles Executes all .io files in given directory. 
   doFiles := method(
     p := self path
     self fileNames foreach(fileName,
@@ -268,8 +268,8 @@ File mimeTypes := {
 }
 
 File do(
-  //doc File ext() Returns file's extension. (Letters after last ".")
+  //doc File ext Returns file's extension. (Letters after last ".")
   ext := method(self name split(".") last)
-  //doc File mimeType() Returns file's MIME type.
+  //doc File mimeType Returns file's MIME type.
   mimeType := method(File mimeTypes[self ext])
 )

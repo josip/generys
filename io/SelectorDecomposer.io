@@ -1,11 +1,10 @@
 SGML
 Regex
 
-// Known bugs:
-//  * Attributes with # and . will be interpreted as ids and classes respectively
+// Notes:
 //  * No support for pseudo classes
-//  * Not well tested, could return wrong items
-//  * NOTE: SGMLParser messes up doctype definitions
+//  * Not well tested, could return wrong stuff
+//  * SGMLParser messes up doctype definitions
 SelectorDecomposer := Object clone do(
 //metadoc SelectorDecomposer category XML
 /*metadoc SelectorDecomposer description
@@ -30,7 +29,7 @@ doc := """
         &lt;li&gt;&lt;a href=&quot;http://en.wikipedia.org/wiki/Banana&quot;&gt;Banana&lt;/a&gt;&lt;/li&gt;
         &lt;li&gt;Mars&lt;/li&gt;
         &lt;li&gt;Nutella&lt;/li&gt;
-        &lt;li class=&quot;lasInList&quot;&gt;Pistacio&lt;/li&gt;
+        &lt;li class=&quot;lastInList&quot;&gt;Pistacio&lt;/li&gt;
       &lt;/ul&gt;
     &lt;/p&gt;
   &lt;/body&gt;
@@ -64,14 +63,14 @@ doc find("li") last addClassName("lastInList")
   # only slow down the process, apparently reading from Map/Object is quite slower (2x) than
   # matching five Regexp-es (4 selectors + chunker)
     decomposed := Map clone
-    decomposed atPut("tag", selector allMatchesOfRegex(self selectors tag) at(0) ?captures ?at(0))
+    decomposed atPut("tag", selector allMatchesOfRegex(self selectors tag) first ?captures ?first)
     
     attrs := Map clone
     selector allMatchesOfRegex(self selectors attr) map(match, attrs atPut(match captures at(1), match captures at(4)))
     decomposed atPut("attributes", attrs)
     attrsJoined := attrs values join(" ")
 
-    id := selector allMatchesOfRegex(self selectors id) at(0) ?captures ?at(1)
+    id := selector allMatchesOfRegex(self selectors id) first ?captures ?at(1)
     // Discard cases like a[href=#id], where #id would be matched
     attrsJoined containsSeq("#" .. id) ifFalse(decomposed atPut("id", id))
     
@@ -83,12 +82,19 @@ doc find("li") last addClassName("lastInList")
     decomposed)
 
   //doc SelectorDecomposer split(cssQuery) Splits query into individual selectors. Returns List.
-  split := method(query, query allMatchesOfRegex(self chunker) map(captures at(0)))
+  split := method(query, query allMatchesOfRegex(self chunker) map(captures first))
 )
 //doc SelectorDecomposer clone Return SelectorDecomposer (singleton).
 SelectorDecomposer clone = SelectorDecomposer
 
 SGMLElement do(
+  //doc SGMLElement at(index) Returns subitem at provided <code>index</code>.
+  at := method(n,
+    self subitems at(n))
+  
+  //doc SGMLElement squareBrackets(index) Alias of <code>SGMLElement at</code>.
+  squareBrackets := getSlot("at")
+
   //doc SGMLElement isMatchedBySelector(anSelector) Tests if element matches <code>anSelector</code>.
   isMatchedBySelector := method(selector,
     (selector type == "Sequence") ifTrue(selector = SelectorDecomposer decompose(selector))
@@ -98,20 +104,20 @@ SGMLElement do(
     reqClasses  := selector at("classes")
     reqAttrs    := selector at("attributes")
     
-    if(reqId and (self attribute("id") != reqId), return(false))
+    if(reqId and(self attribute("id") != reqId), return(false))
     if(reqTag and(self name != reqTag), return(false))
     
     reqClasses isEmpty ifFalse(
-      elClasses := self attribute("class") ?splitNoEmpties(" ") ?sort
-      (elClasses == reqClasses) ifFalse(return(false)))
+      elClasses := self attribute("class") ?splitNoEmpties(" ")
+      (elClasses containsAll(reqClasses)) ifFalse(return(false)))
 
     (reqAttrs keys size > self attributes size) ifTrue(return(false))
     reqAttrs map(k, v, self attribute(k) == v) contains(false) ifTrue(return(false))
 
     true)
 
-  /*doc SGMLElement elementsBySelector(selector, results)
-  Returns direct children of current element which are matched by <code>selector</code>. It can be either Sequence or decomposed selector (Map returned by <code>SelectorDecomposer decompose()</code>).
+  /*doc SGMLElement elementsBySelector(selector[, results])
+  Returns direct children of current element which are matched by <code>selector</code>. It can be either Sequence or decomposed selector (Map returned by <code>SelectorDecomposer decompose</code>).
   <code>results</code> is an optional argument which may contain List of other elements*/
   elementsBySelector := method(selector, results,
     (selector type == "Sequence") ifTrue(selector = SelectorDecomposer decompose(selector))
@@ -131,10 +137,10 @@ SGMLElement do(
       result = result flatten map(elementsBySelector(selector)) flatten)
 
     result)
-  
-  //doc SGMLElement findFirst(query) Returns first item of result returned by <code>SGMLElement find()</code>.
-  findFirst := method(query, self find(query) at(0))
-  
+
+  //doc SGMLElement findFirst(query) Returns first item of result returned by <code>SGMLElement find</code>.
+  findFirst := method(query, self find(query) first)
+
   //doc SGMLElement adopt(htmlCode) Converts <code>htmlCode</code> to SGMLElement and sets caller as its parent.
   adopt := method(el,
     (el type == "Sequence") ifTrue(el = el asHTML)
@@ -150,7 +156,7 @@ SGMLElement do(
     self adopt(el) foreach(el, self subitems prepend(el))
     self)
 
-  //doc SGMLElement positionInParent() Returns index at which current element is in its parent.
+  //doc SGMLElement positionInParent Returns index at which current element is in its parent.
   positionInParent := method(self parent subitems indexOf(self))
 
   //doc SGMLElement prev([move]) Returns element before the caller.

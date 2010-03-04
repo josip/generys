@@ -43,8 +43,8 @@ ChatWebSocketHandler := WebSocketHandler clone do(
 
   /*doc WebSocketHandler processData(data)
   <p>Method which is directly called from WebSocket when data arrives.
-  This method then, if user is authenticated calls <code>WebSocketHandler proccessMessage()</code>
-  or <code>WebSocketHandler authenticate()</code> otherwise.
+  This method then, if user is authenticated calls <code>WebSocketHandler proccessMessage</code>
+  or <code>WebSocketHandler authenticate</code> otherwise.
   </p>
   <p>It is recommended that if you'll have to overwrite this slot,
   that you do it after authentication happens (unless the authentication proccess is what you're changing).</p>*/
@@ -122,7 +122,7 @@ WebSocket := Object clone do(
     
     self origins contains(origin))
   
-  //doc WebSocket handshake() Performs WebSocket handshake.
+  //doc WebSocket handshake Performs WebSocket handshake.
   handshake := method(
     self verifyHeaders ifFalse(
       log debug("Closed WebSocket due to bad headers. Received headers:" .. (self requestHeaders asObject))
@@ -164,7 +164,7 @@ WebSocket := Object clone do(
       self close)
     self)
   
-  //doc WebSocket listen() Internal method which acts on data received by client.
+  //doc WebSocket listen Internal method which acts on data received by client.
   listen := method(
     self socket isOpen ifFalse(
       return(self close))
@@ -192,7 +192,7 @@ WebSocket := Object clone do(
 
     tailCall)
 
-  //doc WebSocket close() Closes socket and removes <code>self</code> from <code>Generys webSockets</code>.
+  //doc WebSocket close Closes socket and removes <code>self</code> from <code>Generys webSockets</code>.
   close := method(
     try(self handler handleSocketClose)
     self handler = nil

@@ -43,7 +43,7 @@ Io> db["vanilla"]
 
     CouchDoc from(Yajl parseJson(resp)) setDb(self))
   
-  //doc CouchDB squareBrackets(id[, options]) Alias of <code>CouchDB at()</code>.
+  //doc CouchDB squareBrackets(id[, options]) Alias of <code>CouchDB at</code>.
   squareBrackets := getSlot("at")
 
   /*doc CouchDB atPut(id, document)
@@ -68,7 +68,7 @@ Io> db["vanilla"]
       doc atPut("_rev", resp["rev"])))
   
   
-  //doc CouchDB create() Creates database.
+  //doc CouchDB create Creates database.
   create := method(
     req := URL with(self url)
     resp := req put
@@ -89,10 +89,10 @@ Io> db["vanilla"]
     resp := req fetch
     
     self parseStatusCode(req statusCode, resp) ifTrue(
-      # We have to excplicitly return() 'cos Io would return true otherwise.
+      # We have to excplicitly return 'cos Io would return true otherwise.
       return(CouchDBView with(Yajl parseJson(resp), self))))
   
-  //doc CouchDB getView(viewName[, options]) Alias of <code>CouchDB select()</code>
+  //doc CouchDB getView(viewName[, options]) Alias of <code>CouchDB select</code>
   getView := getSlot("select")
 
   //doc CouchDB parseStatusCode(code, body) Parses status code and raises CouchDBException if needed.
@@ -121,7 +121,8 @@ CouchDBException := Exception clone do(
 CouchDoc := Map clone do(
 //metadoc CouchDoc category Networking
 //metadoc CouchDoc description Map with extra methods for easier interaction with CouchDB
-  db    ::= nil
+  db        ::= nil
+  isDeleted ::= false
   
   init := method(
     self notifications := Object clone
@@ -150,12 +151,12 @@ CouchDoc := Map clone do(
         docProto with(obj))
     ))
   
-  //doc CouchDoc id() Returns value of <code>_id</code> property.
+  //doc CouchDoc id Returns value of <code>_id</code> property.
   id := method(self["_id"])
-  //doc CouchDoc rev() Returns value of <code>_rev</code> property.
+  //doc CouchDoc rev Returns value of <code>_rev</code> property.
   rev := method(self["_rev"])
 
-  /*doc CouchDoc delete()
+  /*doc CouchDoc delete
   Deletes document from database.
   Emits <code>beforeDelete</code> and <code>afterDelete</code> events.*/
   delete := method(
@@ -166,10 +167,10 @@ CouchDoc := Map clone do(
     req := URL with(self db url .. id .. "?rev=" .. rev)
     resp := req delete
     self db parseStatusCode(req statusCode) ifTrue(
-      self isDeleted := true
+      self isDeleted = true
       self notifications afterDelete post))
 
-  /*doc CouchDoc update()
+  /*doc CouchDoc update
   Saves document to database.
   Emits <code>beforeUpdate</code> and <code>afterUpdate</code> events.*/
   update  := method(
@@ -177,10 +178,10 @@ CouchDoc := Map clone do(
     self db atPut(id, self) ifTrue(
       self notifications afterUpdate post)
     self)
-  //doc CouchDoc save() Alias of <code>CouchDoc update()</code>.
+  //doc CouchDoc save Alias of <code>CouchDoc update</code>.
   save    := getSlot("update")
 
-  /*doc CouchDoc create()
+  /*doc CouchDoc create
   Creates document in the database.
   Emits <code>beforeCreate</code> and <code>afterCreate</code> events.*/
   create  := method(
@@ -244,13 +245,13 @@ CouchDBView := Object clone do(
   //doc CouchDBView at(index) Returns row at <code>index</code>.
   at := method(index,
     self rows at(index); self)
-  //doc CouchDBView squareBrackets(index) Alias of <code>CouchDBViewResponse at()</code>.
+  //doc CouchDBView squareBrackets(index) Alias of <code>CouchDBViewResponse at</code>.
   squareBrackets := getSlot("at")
 
-  //doc CouchDBView keys() Returns list of all keys provided by view response.
+  //doc CouchDBView keys Returns list of all keys provided by view response.
   keys := method(self rows map(["key"]))
   
-  //doc CouchDBView values() Returns list of all values.
+  //doc CouchDBView values Returns list of all values.
   values := method(self rows map(["value"]))
   
   //doc CouchDBView size Returns size rows returned by CouchDB.
@@ -306,14 +307,14 @@ Io> IceCream["chocolate"] == chocolate
   //doc CouchDocTemplate docProt Slots added to his object will be available to all documents created from this template.
   docProto    ::= nil
   
-  //doc CouchDocTemplate setup() Use this method when defining CouchDocTemplate.
+  //doc CouchDocTemplate setup Use this method when defining CouchDocTemplate.
   setup := method(
     self clone doMessage(call message setName("do")) done)
 
   init := method(
     self setDocProto(CouchDoc clone))
 
-  //doc CouchDocTemplate done() If you're not using <code>CouchDocTemplate setup()</code> make sure you call this method after you've defined CouchDocTemplate and all the properties.
+  //doc CouchDocTemplate done If you're not using <code>CouchDocTemplate setup</code> make sure you call this method after you've defined CouchDocTemplate and all the properties.
   done := method(
     self db ifNil(self db = CouchDB default ifNil(Exception raise("No database defined")))
     self docProto setDb(self db)
@@ -323,7 +324,7 @@ Io> IceCream["chocolate"] == chocolate
   //doc CouchDocTemplate property(propertyName) Adds property to template. No magic for now.
   property := method(prop, self properties append(prop))
   
-  //doc CouchDocTemplate timestamps() Adds <em>created_at</em> and <em>updated_at</em> properties, as well as listeners to template.
+  //doc CouchDocTemplate timestamps Adds <em>created_at</em> and <em>updated_at</em> properties, as well as listeners to template.
   timestamps := method(
     self property("created_at")
     self property("updated_at")
@@ -349,6 +350,6 @@ Io> IceCream["chocolate"] == chocolate
   //doc CouchDocTemplate at(id) Returns CouchDoc with <code>docProto</code> methods.
   at := method(id, self docProto from(self db[id]))
   
-  //doc CouchDocTemplate squareBrackets(id) Alias for <code>CouchDocTemplate at()</code>.
+  //doc CouchDocTemplate squareBrackets(id) Alias for <code>CouchDocTemplate at</code>.
   squareBrackets := getSlot("at")
 )

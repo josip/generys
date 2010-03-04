@@ -36,9 +36,9 @@ ResponseFormatter clone do(
     log debug("#{error coroutine}")
 
     # Tests first if specialised Exceptions controller exists, if not, use the default one.
-    # We call cloneWithoutInit() on ExceptionsController becouse init method contains code
+    # We call cloneWithoutInit on ExceptionsController becouse init method contains code
     # which appends the controller to Generys controllers, something we don't need.
-    excpCtrl := Generys controllers at((req activatedRoute ?controller) .. "Exceptions") ?clone ifNil(
+    excpCtrl := if(Generys controllers at((req activatedRoute ?controller) .. "Exceptions") ?clone isNil,
                 ExceptionsController cloneWithoutInit)
     excpCtrl setRequest(req) setResponse(resp)
 

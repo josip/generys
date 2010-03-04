@@ -20,14 +20,14 @@ Router.
   //doc Router DELETE(pattern) Creates Route which will only respond to HTTP DELETE. Returns RouteMatch.
   DELETE  := method(pattern, self connect(pattern) ifHttpMethod("DELETE"))
 
-  //doc Router defaultRoutes() Assings default routes which enables acces to all controllers and their actions.
+  //doc Router defaultRoutes Assings default routes which enables acces to all controllers and their actions.
   defaultRoutes := method(
     self connect("/:controller/:action/:id.:format") to({controller: "#{controller}", action: "#{action}"})
     self connect("/:controller/:action/:id")         to({controller: "#{controller}", action: "#{action}"})
     self connect("/:controller/:action")             to({controller: "#{controller}", action: "#{action}"})
     self connect("/:controller")                     to({controller: "#{controller}", action: "index"}))
 
-  /*doc Router fileServerRoutes()
+  /*doc Router fileServerRoutes
   Assings route wich will check if a file exists in <code>Generys staticDir</code> which matches request path.
   If such file exits it will be served to the client.
   Note: this method has to be called explicitly in <code>routes.io</code> as a last route.
@@ -69,7 +69,7 @@ RouteMatch is the object with which you operate in routes.io. It provides method
       self route responseMethod := call evalArgAt(0),
       call evalArgAt(0) foreach(k, v, self route setSlot(k, v)))
     self)
-  //metadoc RouteMatch from() Same as <code>RouteMatch to</code>.
+  //metadoc RouteMatch from Same as <code>RouteMatch to</code>.
   from := getSlot("to")
 
   //doc RouteMatch ifHttpMethod(httpVerb) Same as <code>RouteMatch ifHttpMethods</code>.
@@ -111,7 +111,7 @@ ResourceMatch := Object clone do(
 //metadoc ResourceMatch category Networking
 /*metadoc ResourceMatch description
 <p>
-ResourceMatch is object which is returned by <code>Router resource()</code> and you'll be mostly woking with it in <code>router.io</code>.
+ResourceMatch is object which is returned by <code>Router resource</code> and you'll be mostly woking with it in <code>router.io</code>.
 It provides convience methods for creating Routes which will automatically bind your controller's methods on a RESTful way.
 </p>
 <p>Routeing table for <code>Router resource("IceCream")</code>:</p>
@@ -211,7 +211,7 @@ CarsController := Controller clone do(
   with := method(name,
     self clone setName(name) setup)
 
-  //doc ResourceMatch setup() Installs resource methods.
+  //doc ResourceMatch setup Installs resource methods.
   setup := method(
     self controllerPath = ("/" .. (self name) .. "s") asLowercase
     self resourcePath =  ("/" .. (self name) .. "/:id") asLowercase
@@ -255,7 +255,7 @@ CarsController := Controller clone do(
   connectToResource := method(pattern, slotName,
     Router connect((self resourcePath) .. "/" .. pattern) to({controller: self name, action: slotName}))
 
-  //doc ResourceMatch hasOne() Not implemented. Returns <code>self</code>.
+  //doc ResourceMatch hasOne Not implemented. Returns <code>self</code>.
   hasOne := method(resourceName, self)
   
   //doc ResourceMatch hasMany(resourceName)

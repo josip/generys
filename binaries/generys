@@ -39,12 +39,14 @@ Menu := Object clone do(
       self numberOfInstances repeat(n,
         threadConf := self config clone
         threadConf = threadConf setPort(threadConf port + n) serialized
-        threadCode := Sequence clone appendSeq(\
-          "Directory setCurrentWorkingDirectory(\"", Directory currentWorkingDirectory, "\")\n",\
-          "doFile(\"main.io\")\n",\
-          "_config := ", threadConf,\
-          "Generys config = _config appendProto(Generys config)\n",\
-          "Generys serve")
+        cwd := Directory currentWorkingDirectory
+        threadCode := """
+          Directory setCurrentWorkingDirectory("#{dir}")
+          doFile("main.io")
+          _config := #{threadConf}
+          Generys config = _config appendProto(Generys config)
+          Generys serve
+        """ interpolate
         Thread createThread(threadCode))
 
       while(Thread threadCount > 1, System sleep(5))

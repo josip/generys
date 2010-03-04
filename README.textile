@@ -1,0 +1,88 @@
+h1. Generys, wanna-be web framework for "Io":http://iolanguage.com
+
+h2. What's the point?
+
+Mostly it was a personal goal to learn a bit more about the amazing little language called Io. 
+Another goal was to create a simple web framework which could
+reliably serve lots of *data* -- no Views or templates, since all of that can be done within browser,
+why should I waste my money on expensive servers?
+
+h2. How to use
+
+Explore. :)
+
+Place all your controllers into app/controllers/ and make sure you assign to
+a variable whose name ends with "Controller", like <code>CarsController := Controller clone do(...)</code>.
+
+Basic documentation is also available, just remember to <code>$ make doc</code>.
+
+h2. Model?
+
+The "framework" is DB-agnostic, yet it contains a small "CouchDB":http://couchdb.apache.org/ library, which is
+far from complete. IORM seems like a good choice.
+
+h2. View
+
+Even tough there is no baked-in support for templating, Generys has a trick in her sleeve!
+<code>SelectorDecomposer</code> provides jQuery-like mechanism for querying and modifying instances of <code>SGMLElement</code>.
+Take a look at <code>samples/Chat/app/Controllers/ExceptionController.io</code> on how to use it.
+
+h2. How to run
+
+You can <code>cd</code> to directory where your application is placed and run <code>io</code>.
+You can also, run <code>generys -r=/path/to/project</code>, assuming you've installed <code>generys</code> "binary".
+
+h2. Io additions
+
+To work more easily with Io, Generys has few tricks:
+First of all, you can use JSON syntax for Maps!
+Yes, this is a valid Io code:  
+<pre><code>{colour: "Red", favourite: false, numbers:[1, 2, 3]}<code></pre>
+
+To access an item from Map or List you can use square brackets:  
+<pre>
+<code>
+anMap["colour"] == anMap at("colour")
+anMap["colour", "favourite"] == anMap select(key, value, key == "colour" or key == "favourite")
+anList[ 0] == anList at(0)
+anList[1,-1] == anList exSlice(1, -1)
+"string"[0] == 115
+"string"[0, 1] == "string" exSlice(0, 1)
+</code>
+</pre>
+
+h2. Coding style
+
+Just to make it more fun, all closing brackets are in the same line:  
+<pre>
+<code>
+lispy := method(
+  self isThisLispInspired ifTrue(
+    "Yes, it is!" println))
+</code>
+</pre>
+  
+With one notable exception:
+<pre>
+<code>
+Object clone do(
+  methodsAndStuff := true
+)
+</code>
+</pre>
+
+"Class" variables are addressed with <code>self</code> before, just to differentiate them from "instance" variables.
+<pre>
+<code>
+Car := Object clone do(
+  a := 4
+  b := 5
+
+  switchPlaces := method(
+    c := self a
+    self a = self b
+    self b = c
+    self)
+)
+</code>
+</pre>

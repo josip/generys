@@ -53,9 +53,9 @@ ZooController := Controller clone do(
   private       ::= false
   //doc Controller privateSlots List of private slots, you can add names of slots whose names don't begin with an underscore.
   privateSlots  ::= nil
-  //doc Controller beforeFilters List of <em>before</em> filters. Use <code>Generys beforeFilter()</code> to append new filter to controller.
+  //doc Controller beforeFilters List of <em>before</em> filters. Use <code>Generys beforeFilter</code> to append new filter to controller.
   beforeFilters ::= nil
-  #doc Controller afterFilters List of <em>after</em> filters. Use <code>Generys afterFilter()</code> to append new filter to controller.
+  #doc Controller afterFilters List of <em>after</em> filters. Use <code>Generys afterFilter</code> to append new filter to controller.
   afterFilters  ::= nil
   #doc Controller targetAction Name of the slot which was first called (the one specified in route for current request) 
   targetAction  ::= nil
@@ -94,7 +94,7 @@ ZooController := Controller clone do(
   /*doc Controller afterFilter(filter, options)
   Adds a method to list of methods which will be called after target slot (one defined by rotue) is called.
   When called first argument will be response by targeted slot.
-  For more details take a look at <code>Controller beforeFilter()</code>. */
+  For more details take a look at <code>Controller beforeFilter</code>. */
   afterFilter  := method(filter, options,
     options ifNil(options = Map clone)
     self afterFilters append(options merge({filter: filter})))
@@ -109,9 +109,9 @@ ZooController := Controller clone do(
         self performWithArgList(filter["filter"], args),
         self doMethod(filter["filter"]))); nil)
 
-  //doc Controller doBeforeFilters() Performs all <code>beforeFilters</code>
+  //doc Controller doBeforeFilters Performs all <code>beforeFilters</code>
   doBeforeFilters := method(args, doFilters(self beforeFilters, args))
-  //doc Controller doAfterFilters() Performs all <code>afterFilters</code>
+  //doc Controller doAfterFilters Performs all <code>afterFilters</code>
   doAfterFilters  := method(args, doFilters(self afterFilters, args))
 
   /*doc Controller accepts(httpVerb, ...)
@@ -147,7 +147,7 @@ ZooController := Controller clone do(
   cacheFor := method(dur,
     self response setHeader("Cache-Control", "max-age=" .. dur .. ", must-revalidate"))
 
-  //doc Controller dontCache() Disables client-side cache for current request. 
+  //doc Controller dontCache Disables client-side cache for current request. 
   dontCache := method(
     self response setHeader("Expires", Date fromNumber(0) asHTTPDate)
     self response setHeader("Cache-Control", "no-cache, no-store"))
@@ -173,7 +173,7 @@ ZooController := Controller clone do(
 
   /*doc Controller redirectToRoute(routeName[, routeParams])
   Redirect client to URL at which route will be activated.
-  <code>routeParams</code> will be passed to <code>Route interpolate()</code>.*/
+  <code>routeParams</code> will be passed to <code>Route interpolate</code>.*/
   redirectToRoute := method(routeName, params,
     params ifNil(params = Map clone)
     
@@ -210,11 +210,11 @@ ZooController := Controller clone do(
     _session isNil ifFalse(self session = _session)
     _session)
 
-  //doc Controller destroySession() Destroys all session data and returns empty one.
+  //doc Controller destroySession Destroys all session data and returns empty one.
   destroySession := method(
     Generys sessions removeAt(self session sessionId))
 
-  //doc Controller view(path) Alias for <code>HTML fromFile()</code>. Value of <code>Generys root</code> is prepended to <code>path</code>.
+  //doc Controller view(path) Alias for <code>HTML fromFile</code>. Value of <code>Generys root</code> is prepended to <code>path</code>.
   view := method(path,
     HTML fromFile((Generys root) .. "/" .. path))
 )

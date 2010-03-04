@@ -15,7 +15,9 @@ ObjectTest := UnitTest clone do(
       chocolate   := true
       vanilla     := true
       strawberry  := false
-    )
+    ) asMap
     
-    assertEquals(flavours asMap asJson, {chocolate: true, vanilla: true, strawberry: false} asJson))
+    assertTrue(flavours at("chocolate"))
+    assertTrue(flavours at("vanilla"))
+    assertFalse(flavours at("strawberry")))
 )
