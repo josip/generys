@@ -37,43 +37,36 @@ h2. Io additions
 To work more easily with Io, Generys has few tricks:
 First of all, you can use JSON syntax for Maps!
 Yes, this is a valid Io code:  
-<pre><code>{colour: "Red", favourite: false, numbers:[1, 2, 3]}<code></pre>
+<pre><code>{colour: "Red", favourite: false, numbers:[1, 2, 3]}</code></pre>
 
 To access an item from Map or List you can use square brackets:  
-<pre>
-<code>
+<pre><code>
 anMap["colour"] == anMap at("colour")
 anMap["colour", "favourite"] == anMap select(key, value, key == "colour" or key == "favourite")
 anList[ 0] == anList at(0)
 anList[1,-1] == anList exSlice(1, -1)
 "string"[0] == 115
 "string"[0, 1] == "string" exSlice(0, 1)
-</code>
-</pre>
+</code></pre>
 
 h2. Coding style
 
 Just to make it more fun, all closing brackets are in the same line:  
-<pre>
-<code>
+<pre><code>
 lispy := method(
   self isThisLispInspired ifTrue(
     "Yes, it is!" println))
-</code>
-</pre>
+</code></pre>
   
 With one notable exception:
-<pre>
-<code>
+<pre><code>
 Object clone do(
   methodsAndStuff := true
 )
-</code>
-</pre>
+</code></pre>
 
 "Class" variables are addressed with <code>self</code> before, just to differentiate them from "instance" variables.
-<pre>
-<code>
+<pre><code>
 Car := Object clone do(
   a := 4
   b := 5
@@ -84,5 +77,4 @@ Car := Object clone do(
     self b = c
     self)
 )
-</code>
-</pre>
+</code></pre>
