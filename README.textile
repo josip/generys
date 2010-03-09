@@ -7,6 +7,10 @@ Another goal was to create a simple web framework which could
 reliably serve lots of *data* -- no Views or templates, since all of that can be done within browser,
 why should I waste my money on expensive servers?
 
+h2. Install
+
+Use "Eerie":http://github.com/josip/Eerie to install Generys.
+
 h2. How to use
 
 Explore. :)
