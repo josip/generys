@@ -1,0 +1,23 @@
+{
+  "version": 0.2,
+  "author": "Josip Lisec",
+  "description": "Wanna-be web framework for Io.",
+  "readme": "README.textile",
+  "category": "Networking",
+
+  "dependencies": {
+    "protos": ["Volcano", "Regex", "SGML"]
+  },
+  "protos": [
+    "Generys",
+    "Controller",
+    "CouchDB",
+    "CouchDocTemplate",
+    "Channel",
+    "Router",
+    "Log",
+    "HTML",
+    "WebSocket",
+    "UnitTestExensions"
+  ]
+}
