@@ -56,13 +56,13 @@ Menu := Object clone do(
   i := method(path,
     path := Directory with(Path absolute(path))
     path exists ifTrue(return "Directory #{path path} already exists!" interpolate println)
-    
+
     path create
     skeletonDir := System ioPath .. "/addons/Generys/skeleton"
     System system("cp -R #{skeletonDir}/ #{path path}" interpolate)
     "- Copied Generys files to #{path}" interpolate println
     System exit)
-  
+
   # Version
   v := method(
     "Hi, my name is Generys and I'm #{Generys version} years old." interpolate println
@@ -74,7 +74,7 @@ Menu := Object clone do(
     path = path .. "tests/correctness"
     " - Running tests in #{path}" interpolate println
 
-    # run.io Relies on System launchPath 
+    # run.io relies on System launchPath 
     System launchPath = path
     doFile(path .. "/run.io")
     System exit)

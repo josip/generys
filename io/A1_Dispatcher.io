@@ -84,8 +84,8 @@ An HTTP request dispatcher, it is responsible for selecting right route dependin
       obj ?doAfterFilters([slotResp])
       obj ?session ?save)
 
-    # We can't return from catch block, therefor
-    # we have to use this little dirty trick
+    # We can't return from catch block, so we have to
+    # use this little dirty trick
     # (other exceptions are handled by ResponseFormatter)
     _skipRoute := false
     e catch(_skipRoute = e ?error == "skipRoute")

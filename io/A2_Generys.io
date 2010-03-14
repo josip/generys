@@ -57,9 +57,9 @@ Generys := HttpServer clone do (
     doFile(self root .. "/config/routes.io")
     doFile(self envDir .. "/init.io")
 
-    Directory with(self root .. "/app/models") doFiles
-    Directory with(self root .. "/app/controllers") doFiles
-    Directory with(self root .. "/lib") doFiles
+    doFiles(self root .. "/app/models")
+    doFiles(self root .. "/app/controllers")
+    doFiles(self root .. "/lib")
 
     self  setHost(self config host)\
           setPort(self config port)

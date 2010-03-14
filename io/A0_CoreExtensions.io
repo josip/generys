@@ -26,6 +26,13 @@ Object do(
 
   //doc Object asJson Converts Object to JSON Sequence.
   asJson := method(self asMap asJson)
+  
+  //doc Object doFiles(path) Executes all .io files in given directory.
+  doFiles := method(dirPath,
+    dir := Directory with(dirPath)
+    dir exists ifFalse(return(false))
+    dir filesWithExtension("io") foreach(file,
+      doFile(file path)))
 )
 
 /*doc List squareBrackets
@@ -87,13 +94,7 @@ Date do(
 )
 
 Directory do(
-  //doc Directory doFiles Executes all .io files in given directory. 
-  doFiles := method(
-    p := self path
-    self fileNames foreach(fileName,
-      fileName containsSeq(".io") ifTrue(doFile(p .. "/" .. fileName))))
-
-  //doc Directory mimeType Returns "application/x-not-regular-file".
+  //doc Directory mimeType Equals to "application/x-not-regular-file".
   mimeType := "application/x-not-regular-file"
 )
 
